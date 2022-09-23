@@ -1,0 +1,3 @@
+-- Most popular categories of products
+-- Highest rated products
+-- Items that are often purchased together
