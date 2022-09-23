@@ -23,7 +23,7 @@ from pprint import pprint
 import requests
 from datetime import datetime, timedelta
 
-driver = webdriver.Chrome(r"C:\Users\Batz4\OneDrive\Desktop\SeleniumDrivers\chromedriver.exe")
+driver = webdriver.Chrome(r"/Users/j/Desktop/work/ascend/data engineers/chromedriver")
 
 
 products = ['milk', 'eggs', 'bread']
