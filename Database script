@@ -9,7 +9,7 @@
 
 CREATE TABLE Users
 (
-    UserID INT NOT NULL,
+    UserID INT NOT NULL AUTO_INCREMENT,
     Email VARCHAR(50) NOT NULL,
     FirstName VARCHAR(50) NOT NULL,
     LastName VARCHAR(50) NOT NULL, 
@@ -20,7 +20,7 @@ CREATE TABLE Users
 
 CREATE TABLE Addresses
 (
-    AddressID INT NOT NULL,
+    AddressID INT NOT NULL AUTO_INCREMENT,
     UserID INT NOT NULL,
     RecipientName VARCHAR(50),
     Street VARCHAR(50) NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE Products
 
 CREATE TABLE CartItems
 (
-    CartItemID INT NOT NULL,
+    CartItemID INT NOT NULL AUTO_INCREMENT,
     UserID INT NOT NULL,
     UPC CHAR(12) NOT NULL,
     Quantity INT,
@@ -62,7 +62,7 @@ CREATE TABLE CartItems
 
 CREATE TABLE CreditCards
 (
-    credit_card_id INT NOT NULL,
+    credit_card_id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     cardholder_name VARCHAR(40) NOT NULL,
     bank_name VARCHAR(40) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE CreditCards
 
 CREATE TABLE Orders
 (
-    OrderID INT NOT NULL,
+    OrderID INT NOT NULL AUTO_INCREMENT,
     UserID INT NOT NULL,
     AddressID INT NOT NULL,
     Price FLOAT NOT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE Orders
 
 CREATE TABLE OrderItems
 (
-    OrderItemID INT NOT NULL,
+    OrderItemID INT NOT NULL AUTO_INCREMENT,
     OrderID INT NOT NULL,
     Quantity INT NOT NULL,
     UPC CHAR(12) NOT NULL,
