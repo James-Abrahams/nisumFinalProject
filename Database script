@@ -62,16 +62,18 @@ CREATE TABLE CartItems
 
 CREATE TABLE CreditCards
 (
-    CreditCardID INT NOT NULL,
-    UserID INT NOT NULL,
-    CardholderName VARCHAR(40) NOT NULL,
-    BankName VARCHAR(40) NOT NULL,
-    CardType VARCHAR(20) NOT NULL,
-    CardNumber CHAR(16) NOT NULL,
-    SecurityNumber VARCHAR(4) NOT NULL,
-    Expiration DATE NOT NULL,
-    PRIMARY KEY (CreditCardID),
-    FOREIGN KEY (UserID) REFERENCES Users (UserID)
+    credit_card_id INT NOT NULL,
+    user_id INT NOT NULL,
+    cardholder_name VARCHAR(40) NOT NULL,
+    bank_name VARCHAR(40) NOT NULL,
+    card_type VARCHAR(20) NOT NULL,
+    card_number CHAR(16) NOT NULL,
+    security_code VARCHAR(4) NOT NULL,
+    expiration_year CHAR(4) NOT NULL,
+    expiration_month CHAR(2) NOT NULL,
+    PRIMARY KEY (credit_card_id),
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
+
 );
 
 CREATE TABLE Orders
@@ -108,13 +110,13 @@ INSERT INTO Users VALUES (3, "n.johnson@gmail.com", "Nancy", "Johnson", "thisisa
 INSERT INTO Users VALUES (4, "jj1205@msn.com", "Jenny", "Jones", "iforgot", "6264589104");
 INSERT INTO Users VALUES (5, "g.s.l.62@gmail.com", "George", "Lee", "whatismypassword", "3108573221");
 
-INSERT INTO CreditCards VALUES(1, 1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022-09-20' );
-INSERT INTO CreditCards VALUES(2, 3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024-01-25' );
-INSERT INTO CreditCards VALUES(3, 2, 'Andrew Williams', 'Chase', 'MasterCard', '4264483469273672', '700', '2026-09-29' );
-INSERT INTO CreditCards VALUES(4, 5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025-03-15' );
-INSERT INTO CreditCards VALUES(5, 4, 'Jenny Jones', 'Wellsfargo', 'Amex', '3484127952481970', '1101', '2028-06-16' );
-INSERT INTO CreditCards VALUES(6, 3, 'Nancy Johnson', 'CitiBank', 'Discovery', '6091862988814035', '444', '2027-07-11' );
-INSERT INTO CreditCards VALUES(7, 1, 'Bobby Joe', 'Wellsfargo', 'MasterCard', '4100360765536477', '121', '2024-08-07' );
+INSERT INTO credit_cards VALUES(1, 1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022', '09' );
+INSERT INTO credit_cards VALUES(2, 3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024', '01' );
+INSERT INTO credit_cards VALUES(3, 2, 'Andrew Williams', 'HSBC', 'MasterCard', '4264483469273672', '700', '2026', '09' );
+INSERT INTO credit_cards VALUES(4, 5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025', '11' );
+INSERT INTO credit_cards VALUES(5, 4, 'Jenny Jones', 'Wells Fargo', 'Amex', '3484127952481970', '1101', '2028', '10' );
+INSERT INTO credit_cards VALUES(6, 3, 'Nancy Johnson', 'Discover', 'Discover', '6091862988814035', '444', '2027', '07' );
+INSERT INTO credit_cards VALUES(7, 1, 'Bobby Joe', 'Citi', 'MasterCard', '4100360765536477', '121', '2023', '02' );
 
 INSERT INTO Addresses VALUES (1, 1, "Bobby Joe", "100 This st", "Apt 20", "Los Angeles", "CA", "90025", TRUE, TRUE);
 INSERT INTO Addresses VALUES (2, 2, "Andrew Williams", "3211 That Blvd", NULL, "Dallas", "TX", "75011", FALSE, TRUE);
@@ -182,36 +184,6 @@ INSERT INTO OrderItems VALUES(36, 4, 28, '100000001111');
 INSERT INTO OrderItems VALUES(37, 8, 16, '100000000001'); 
 INSERT INTO OrderItems VALUES(38, 10, 13, '100000000111');
 INSERT INTO OrderItems VALUES(39, 10, 86, '100000001111');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 -- MySQL VERSION (snake_case):
@@ -285,11 +257,11 @@ CREATE TABLE credit_cards
     card_type VARCHAR(20) NOT NULL,
     card_number CHAR(16) NOT NULL,
     security_code VARCHAR(4) NOT NULL,
-    expiration DATE NOT NULL,
+    expiration_year CHAR(4) NOT NULL,
+    expiration_month CHAR(2) NOT NULL,
     PRIMARY KEY (credit_card_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
-
 
 CREATE TABLE orders
 (
@@ -325,13 +297,13 @@ INSERT INTO users VALUES (3, "n.johnson@gmail.com", "Nancy", "Johnson", "thisisa
 INSERT INTO users VALUES (4, "jj1205@msn.com", "Jenny", "Jones", "iforgot", "6264589104");
 INSERT INTO users VALUES (5, "g.s.l.62@gmail.com", "George", "Lee", "whatismypassword", "3108573221");
 
-INSERT INTO credit_cards VALUES(1, 1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022-09-20' );
-INSERT INTO credit_cards VALUES(2, 3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024-01-25' );
-INSERT INTO credit_cards VALUES(3, 2, 'Andrew Williams', 'Chase', 'MasterCard', '4264483469273672', '700', '2026-09-29' );
-INSERT INTO credit_cards VALUES(4, 5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025-03-15' );
-INSERT INTO credit_cards VALUES(5, 4, 'Jenny Jones', 'Wellsfargo', 'Amex', '3484127952481970', '1101', '2028-06-16' );
-INSERT INTO credit_cards VALUES(6, 3, 'Nancy Johnson', 'CitiBank', 'Discovery', '6091862988814035', '444', '2027-07-11' );
-INSERT INTO credit_cards VALUES(7, 1, 'Bobby Joe', 'Wellsfargo', 'MasterCard', '4100360765536477', '121', '2024-08-07' );
+INSERT INTO credit_cards VALUES(1, 1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022', '09' );
+INSERT INTO credit_cards VALUES(2, 3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024', '01' );
+INSERT INTO credit_cards VALUES(3, 2, 'Andrew Williams', 'HSBC', 'MasterCard', '4264483469273672', '700', '2026', '09' );
+INSERT INTO credit_cards VALUES(4, 5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025', '11' );
+INSERT INTO credit_cards VALUES(5, 4, 'Jenny Jones', 'Wells Fargo', 'Amex', '3484127952481970', '1101', '2028', '10' );
+INSERT INTO credit_cards VALUES(6, 3, 'Nancy Johnson', 'Discover', 'Discover', '6091862988814035', '444', '2027', '07' );
+INSERT INTO credit_cards VALUES(7, 1, 'Bobby Joe', 'Citi', 'MasterCard', '4100360765536477', '121', '2023', '02' );
 
 INSERT INTO addresses VALUES (1, 1, "Bobby Joe", "100 This st", "Apt 20", "Los Angeles", "CA", "90025", TRUE, TRUE);
 INSERT INTO addresses VALUES (2, 2, "Andrew Williams", "3211 That Blvd", NULL, "Dallas", "TX", "75011", FALSE, TRUE);
@@ -401,28 +373,6 @@ INSERT INTO order_items VALUES(38, 10, 13, '100000000111');
 INSERT INTO order_items VALUES(39, 10, 86, '100000001111');
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- LIVESQL VERSION
 --DROP TABLE OrderItems;
 --DROP TABLE Orders;
@@ -485,18 +435,19 @@ CREATE TABLE CartItems
     FOREIGN KEY (UPC) REFERENCES Products (UPC)
 );
 
-CREATE TABLE CreditCards
+CREATE TABLE credit_cards
 (
-    CreditCardID INT NOT NULL,
-    UserID INT NOT NULL,
-    CardholderName VARCHAR(40) NOT NULL,
-    BankName VARCHAR(40) NOT NULL,
-    CardType VARCHAR(20) NOT NULL,
-    CardNumber CHAR(16) NOT NULL,
-    SecurityNumber VARCHAR(4) NOT NULL,
-    Expiration DATE NOT NULL,
-    PRIMARY KEY (CreditCardID),
-    FOREIGN KEY (UserID) REFERENCES Users (UserID)
+    credit_card_id INT NOT NULL,
+    user_id INT NOT NULL,
+    cardholder_name VARCHAR(40) NOT NULL,
+    bank_name VARCHAR(40) NOT NULL,
+    card_type VARCHAR(20) NOT NULL,
+    card_number CHAR(16) NOT NULL,
+    security_code VARCHAR(4) NOT NULL,
+    expiration_year CHAR(4) NOT NULL,
+    expiration_month CHAR(2) NOT NULL,
+    PRIMARY KEY (credit_card_id),
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
 CREATE TABLE Orders
@@ -533,13 +484,13 @@ INSERT INTO Users VALUES (3, 'n.johnson@gmail.com', 'Nancy', 'Johnson', 'thisisa
 INSERT INTO Users VALUES (4, 'jj1205@msn.com', 'Jenny', 'Jones', 'iforgot', '6264589104');
 INSERT INTO Users VALUES (5, 'g.s.l.62@gmail.com', 'George', 'Lee', 'whatismypassword', '3108573221');
 
-INSERT INTO CreditCards VALUES(1, 1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022-09-20' );
-INSERT INTO CreditCards VALUES(2, 3, 'Nancy Johnson','Bank of America', 'Amex', '3734567891011121', '6290', '2024-01-25' );
-INSERT INTO CreditCards VALUES(3, 2, 'Andrew Williams','Chase', 'MasterCard', '4264483469273672', '700', '2026-09-29' );
-INSERT INTO CreditCards VALUES(4, 5, 'George Lee','Chase', 'Visa', '4231902528753161', '232', '2025-03-15' );
-INSERT INTO CreditCards VALUES(5, 4, 'Jenny Jones','Wellsfargo', 'Amex', '3484127952481970', '1101', '2028-06-16' );
-INSERT INTO CreditCards VALUES(6, 3, 'Nancy Johnson','CitiBank', 'Discovery', '6091862988814035', '444', '2027-07-11' );
-INSERT INTO CreditCards VALUES(7, 1, 'Bobby Joe','Wellsfargo', 'MasterCard', '4100360765536477', '121', '2024-08-07' );
+INSERT INTO credit_cards VALUES(1, 1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022', '09' );
+INSERT INTO credit_cards VALUES(2, 3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024', '01' );
+INSERT INTO credit_cards VALUES(3, 2, 'Andrew Williams', 'HSBC', 'MasterCard', '4264483469273672', '700', '2026', '09' );
+INSERT INTO credit_cards VALUES(4, 5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025', '11' );
+INSERT INTO credit_cards VALUES(5, 4, 'Jenny Jones', 'Wells Fargo', 'Amex', '3484127952481970', '1101', '2028', '10' );
+INSERT INTO credit_cards VALUES(6, 3, 'Nancy Johnson', 'Discover', 'Discover', '6091862988814035', '444', '2027', '07' );
+INSERT INTO credit_cards VALUES(7, 1, 'Bobby Joe', 'Citi', 'MasterCard', '4100360765536477', '121', '2023', '02' );
 
 INSERT INTO Addresses VALUES (1, 1, 'Bobby Joe', '100 This st', 'Apt 20', 'Los Angeles', 'CA', '90025', 1, 1);
 INSERT INTO Addresses VALUES (2, 2, 'Andrew Williams', '3211 That Blvd', NULL, 'Dallas', 'TX', '75011', 0, 1);
@@ -608,34 +559,6 @@ INSERT INTO OrderItems VALUES(37, 8, 16, '100000000001');
 INSERT INTO OrderItems VALUES(38, 10, 13, '100000000111');
 INSERT INTO OrderItems VALUES(39, 10, 86, '100000001111');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- LIVESQL VERSION (snake_case)
 -- DROP TABLE IF EXISTS order_items;
 -- DROP TABLE IF EXISTS orders;
@@ -647,7 +570,7 @@ INSERT INTO OrderItems VALUES(39, 10, 86, '100000001111');
 
 CREATE TABLE users
 (
-    user_id INT NOT NULL,
+    user_id INT NOT NULL AUTO-INCREMENT,
     email VARCHAR(50) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL, 
@@ -658,7 +581,7 @@ CREATE TABLE users
 
 CREATE TABLE addresses
 (
-    address_id INT NOT NULL,
+    address_id INT NOT NULL AUTO-INCREMENT,
     user_id INT NOT NULL,
     recipient_name VARCHAR(50),
     street VARCHAR(50) NOT NULL,
@@ -689,7 +612,7 @@ CREATE TABLE products
 
 CREATE TABLE cart_items
 (
-    cart_item_id INT NOT NULL,
+    cart_item_id INT NOT NULL AUTO-INCREMENT,
     user_id INT NOT NULL,
     upc CHAR(12) NOT NULL,
     quantity INT,
@@ -704,17 +627,18 @@ CREATE TABLE credit_cards
     user_id INT NOT NULL,
     cardholder_name VARCHAR(40) NOT NULL,
     bank_name VARCHAR(40) NOT NULL,
-    card_type VARCHAR(20) NOT NULL,
+    card_type VARCHAR(20) NOT NULL,    
     card_number CHAR(16) NOT NULL,
     security_code VARCHAR(4) NOT NULL,
-    expiration DATE NOT NULL,
+    expiration_year CHAR(4) NOT NULL,
+    expiration_month CHAR(2) NOT NULL,
     PRIMARY KEY (credit_card_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
 CREATE TABLE orders
 (
-    order_id INT NOT NULL,
+    order_id INT NOT NULL AUTO-INCREMENT,
     user_id INT NOT NULL,
     address_id INT NOT NULL,
     price FLOAT NOT NULL,
@@ -731,7 +655,7 @@ CREATE TABLE orders
 
 CREATE TABLE order_items
 (
-    order_item_id INT NOT NULL,
+    order_item_id INT NOT NULL AUTO-INCREMENT,
     order_id INT NOT NULL,
     quantity INT NOT NULL,
     upc CHAR(12) NOT NULL,
@@ -746,13 +670,13 @@ INSERT INTO users VALUES (3, 'n.johnson@gmail.com', 'Nancy', 'Johnson', 'thisisa
 INSERT INTO users VALUES (4, 'jj1205@msn.com', 'Jenny', 'Jones', 'iforgot', '6264589104');
 INSERT INTO users VALUES (5, 'g.s.l.62@gmail.com', 'George', 'Lee', 'whatismypassword', '3108573221');
 
-INSERT INTO credit_cards VALUES(1, 1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022-09-20' );
-INSERT INTO credit_cards VALUES(2, 3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024-01-25' );
-INSERT INTO credit_cards VALUES(3, 2, 'Andrew Williams', 'Chase', 'MasterCard', '4264483469273672', '700', '2026-09-29' );
-INSERT INTO credit_cards VALUES(4, 5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025-03-15' );
-INSERT INTO credit_cards VALUES(5, 4, 'Jenny Jones', 'Wellsfargo', 'Amex', '3484127952481970', '1101', '2028-06-16' );
-INSERT INTO credit_cards VALUES(6, 3, 'Nancy Johnson', 'CitiBank', 'Discovery', '6091862988814035', '444', '2027-07-11' );
-INSERT INTO credit_cards VALUES(7, 1, 'Bobby Joe', 'Wellsfargo', 'MasterCard', '4100360765536477', '121', '2024-08-07' );
+INSERT INTO credit_cards VALUES(1, 1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022', '09' );
+INSERT INTO credit_cards VALUES(2, 3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024', '01' );
+INSERT INTO credit_cards VALUES(3, 2, 'Andrew Williams', 'HSBC', 'MasterCard', '4264483469273672', '700', '2026', '09' );
+INSERT INTO credit_cards VALUES(4, 5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025', '11' );
+INSERT INTO credit_cards VALUES(5, 4, 'Jenny Jones', 'Wells Fargo', 'Amex', '3484127952481970', '1101', '2028', '10' );
+INSERT INTO credit_cards VALUES(6, 3, 'Nancy Johnson', 'Discover', 'Discover', '6091862988814035', '444', '2027', '07' );
+INSERT INTO credit_cards VALUES(7, 1, 'Bobby Joe', 'Citi', 'MasterCard', '4100360765536477', '121', '2023', '02' );
 
 INSERT INTO addresses VALUES (1, 1, 'Bobby Joe', '100 This st', 'Apt 20', 'Los Angeles', 'CA', '90025', 1, 1);
 INSERT INTO addresses VALUES (2, 2, 'Andrew Williams', '3211 That Blvd', NULL, 'Dallas', 'TX', '75011', 0, 1);
