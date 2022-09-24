@@ -4,7 +4,7 @@ from safewayProductsScraper import SafewayProductsScraper
 
 def main():
     sps = SafewayProductsScraper()
-    sds = SafewayDescriptionsScraper()
+    # sds = SafewayDescriptionsScraper()
 
 
 if __name__ == "__main__":

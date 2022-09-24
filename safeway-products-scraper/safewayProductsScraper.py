@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import time
@@ -16,7 +18,7 @@ class SafewayProductsScraper:
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
         self.scrape()
-        self.to_csv(self.out_fn)
+        self.to_csv()
         self.driver.quit()
 
     def create_dataframe(self):
@@ -32,9 +34,28 @@ class SafewayProductsScraper:
     def scrape(self):
         for i, item in enumerate(self.items):
             self.driver.get(f"https://safeway.com/shop/search-results.html?q={item}") # search item on safeway website
+
             if i == 0: self.driver.get(f"https://safeway.com/shop/search-results.html?q={item}") # refresh page to get rid of pop-up
 
+            # select each brand name individually
+            # /html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div[1]/search-facets/div/div[7]/div[2]/div[3]/div[2]/div/div[1]/div[1]/div/input
+            # /html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div[1]/search-facets/div/div[7]/div[2]/div[3]/div[2]/div/div[1]/div[2]/div/input
             time.sleep(2)
+            matches = self.driver.find_elements(By.CLASS_NAME, "facet__label__text")
+            _ = [print(x.text) for x in matches]
+
+            # click load more 3 times
+            for _ in range(3):
+                time.sleep(2)
+                # click load more to display even more products
+                load_more_button = self.driver.find_element(By.XPATH,
+                    '/html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[2]/div[4]/div[2]/search-grid/div[4]/button')
+                actions = ActionChains(self.driver)
+                actions.move_to_element(load_more_button)
+                try:
+                    load_more_button.click()
+                except NoSuchElementException:
+                    break
 
             # product name
             name_elements = self.driver.find_elements(By.CLASS_NAME, 'product-title__name')
@@ -56,7 +77,8 @@ class SafewayProductsScraper:
             img_urls = [e.get_attribute("data-src")[2:] for e in img_elements]
 
             # product category
-            category = self.driver.find_element(By.XPATH, '/html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div[1]/search-facets/div/div[7]/div[2]/div[2]/div[2]/department-filter/div/div[1]/div/span').text
+            category = self.driver.find_element(By.XPATH,
+                '/html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div[1]/search-facets/div/div[7]/div[2]/div[2]/div[2]/department-filter/div/div[1]/div/span').text
             category = category.strip()
             pattern = re.compile(r'([\s\S]*) \(')
             matches = re.findall(pattern, category)
@@ -85,7 +107,7 @@ class SafewayProductsScraper:
         return matches[0]
 
     # writes dataframe to csv file
-    def to_csv(self, out_fn):
+    def to_csv(self):
         self.df.to_csv(self.out_fn,
                        mode='w+', # overwrite existing data file
                        header=True,
