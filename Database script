@@ -66,7 +66,7 @@ CREATE TABLE credit_cards
     user_id INT NOT NULL,
     cardholder_name VARCHAR(40) NOT NULL,
     last_four_card_number CHAR(4) NOT NULL,
-    expiration_year CHAR(4) NOT NULL,
+    expiration_year CHAR(2) NOT NULL,
     expiration_month CHAR(2) NOT NULL,
     PRIMARY KEY (credit_card_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
@@ -314,7 +314,7 @@ CREATE TABLE credit_cards
     user_id INT NOT NULL,
     cardholder_name VARCHAR(40) NOT NULL,
     last_four_card_number CHAR(4) NOT NULL,
-    expiration_year CHAR(4) NOT NULL,
+    expiration_year CHAR(2) NOT NULL,
     expiration_month CHAR(2) NOT NULL,
     PRIMARY KEY (credit_card_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
