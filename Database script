@@ -65,10 +65,7 @@ CREATE TABLE credit_cards
     credit_card_id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     cardholder_name VARCHAR(40) NOT NULL,
-    bank_name VARCHAR(40) NOT NULL,
-    card_type VARCHAR(20) NOT NULL,
     card_number CHAR(16) NOT NULL,
-    security_code VARCHAR(4) NOT NULL,
     expiration_year CHAR(4) NOT NULL,
     expiration_month CHAR(2) NOT NULL,
     PRIMARY KEY (credit_card_id),
@@ -84,7 +81,6 @@ CREATE TABLE orders
     credit_card_id INT NOT NULL,
     date_ordered DATETIME NOT NULL,
     date_shipped DATETIME,
-    date_delivered DATETIME,
     order_status VARCHAR(20) NOT NULL,
     PRIMARY KEY (order_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id),
@@ -114,20 +110,20 @@ INSERT INTO users  (email, first_name, last_name, user_password, phone)
 INSERT INTO users  (email, first_name, last_name, user_password, phone) 
 	VALUES ("g.s.l.62@gmail.com", "George", "Lee", "whatismypassword", "3108573221");
     
-INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022', '09' );
-INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024', '01' );
-INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(2, 'Andrew Williams', 'HSBC', 'MasterCard', '4264483469273672', '700', '2026', '09' );
-INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025', '11' );
-INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(4, 'Jenny Jones', 'Wells Fargo', 'Amex', '3484127952481970', '1101', '2028', '10' );
-INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(3, 'Nancy Johnson', 'Discover', 'Discover', '6091862988814035', '444', '2027', '07' );
-INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(1, 'Bobby Joe', 'Citi', 'MasterCard', '4100360765536477', '121', '2023', '02' );
+INSERT INTO credit_cards (user_id, cardholder_name, card_number, expiration_year, expiration_month) 
+	VALUES(1, 'Bobby Joe', '4443123467891234', '2022', '09' );
+INSERT INTO credit_cards (user_id, cardholder_name, card_number, expiration_year, expiration_month) 
+	VALUES(3, 'Nancy Johnson', '3734567891011121', '2024', '01' );
+INSERT INTO credit_cards (user_id, cardholder_name, card_number, expiration_year, expiration_month) 
+	VALUES(2, 'Andrew Williams', '4264483469273672', '2026', '09' );
+INSERT INTO credit_cards (user_id, cardholder_name, card_number, expiration_year, expiration_month) 
+	VALUES(5, 'George Lee', '4231902528753161', '2025', '11' );
+INSERT INTO credit_cards (user_id, cardholder_name, card_number, expiration_year, expiration_month) 
+	VALUES(4, 'Jenny Jones', '3484127952481970', '2028', '10' );
+INSERT INTO credit_cards (user_id, cardholder_name, card_number, expiration_year, expiration_month) 
+	VALUES(3, 'Nancy Johnson', '6091862988814035', '2027', '07' );
+INSERT INTO credit_cards (user_id, cardholder_name, card_number, expiration_year, expiration_month) 
+	VALUES(1, 'Bobby Joe', '4100360765536477', '2023', '02' );
 
 INSERT INTO addresses (user_id, recipient_name, street, street2, city, state, zip, is_shipping, is_billing)
 	VALUES (1, "Bobby Joe", "100 This st", "Apt 20", "Los Angeles", "CA", "90025", TRUE, TRUE);
@@ -150,26 +146,26 @@ INSERT INTO products VALUES ("100001111111", "Goldfish", "Pepperidge Farm","Gold
 INSERT INTO products VALUES ("100011111111", "Malk", "Now With Vitamin R", "Not actually milk", "Drinks", 0.99, "https://target.scene7.com/is/image/Target/GUEST_fc940329-105c-42ce-8c26-d3d34b1a51b4?wid=800&hei=800&qlt=80&fmt=pjpeg", 39, 3, 3);
 INSERT INTO products VALUES ("600000000002", "Crystal Geyser", "Crystal Geyser Water Company", "Spring Water", "Drinks", 0.99, "https://images.heb.com/is/image/HEBGrocery/001966477", 121, 3, 5);
 
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (1, 1, 10.00, 1, "2011-12-18 13:17:17", "2011-12-18 13:17:17", NULL, "Canceled");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (2, 2, 11.00, 2, "2012-12-18 13:17:17", "2012-12-18 13:17:17", "2012-12-20 13:17:17", "Delivered");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (3, 3, 12.00, 3, "2013-12-18 13:17:17", "2013-12-18 13:17:17", "2013-12-20 13:17:17", "Delivered");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (4, 4, 13.00, 4, "2014-12-18 13:17:17", "2014-12-18 13:17:17", NULL, "Canceled");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (5, 5, 14.00, 5, "2015-12-18 13:17:17", "2015-12-18 13:17:17", NULL, "Canceled");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (1, 1, 10.00, 1, "2015-12-18 13:17:17", "2015-12-18 13:17:17", "2015-12-20 13:17:17", "Delivered");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (2, 2, 11.00, 2, "2016-12-18 13:17:17", "2016-12-18 13:17:17", "2016-12-20 13:17:17", "Delivered");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (3, 3, 12.00, 3, "2017-12-18 13:17:17", "2017-12-18 13:17:17", NULL, "Canceled");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (5, 5, 13.00, 5, "2018-12-17 13:17:17", "2018-12-18 13:17:17", NULL, "Shipped");
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (5, 5, 14.00, 5, "2018-12-18 13:17:17", NULL, NULL, "Pending");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (1, 1, 10.00, 1, "2011-12-18 13:17:17", NULL, "Canceled");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (2, 2, 11.00, 2, "2012-12-18 13:17:17", "2012-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (3, 3, 12.00, 3, "2013-12-18 13:17:17", "2013-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (4, 4, 13.00, 4, "2014-12-18 13:17:17", "2014-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (5, 5, 14.00, 5, "2015-12-18 13:17:17", "2015-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (1, 1, 10.00, 1, "2015-12-18 13:17:17", "2015-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (2, 2, 11.00, 2, "2016-12-18 13:17:17", "2016-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (3, 3, 12.00, 3, "2017-12-18 13:17:17", "2017-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (5, 5, 13.00, 5, "2018-12-17 13:17:17", "2018-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (5, 5, 14.00, 5, "2018-12-18 13:17:17", NULL, "Pending");
 
 INSERT INTO order_items (order_id, quantity, upc)
 	VALUES(6, 72, '100000001111'); 
@@ -331,10 +327,7 @@ CREATE TABLE credit_cards
     credit_card_id INT NOT NULL IDENTITY(1, 1),
     user_id INT NOT NULL,
     cardholder_name VARCHAR(40) NOT NULL,
-    bank_name VARCHAR(40) NOT NULL,
-    card_type VARCHAR(20) NOT NULL,
     card_number CHAR(16) NOT NULL,
-    security_code VARCHAR(4) NOT NULL,
     expiration_year CHAR(4) NOT NULL,
     expiration_month CHAR(2) NOT NULL,
     PRIMARY KEY (credit_card_id),
@@ -350,7 +343,6 @@ CREATE TABLE orders
     credit_card_id INT NOT NULL,
     date_ordered DATETIME NOT NULL,
     date_shipped DATETIME,
-    date_delivered DATETIME,
     order_status VARCHAR(20) NOT NULL,
     PRIMARY KEY (order_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id),
@@ -381,19 +373,19 @@ INSERT INTO users  (email, first_name, last_name, user_password, phone)
 	VALUES ('g.s.l.62@gmail.com', 'George', 'Lee', 'whatismypassword', '3108573221');
     
 INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(1, 'Bobby Joe', 'Capital One', 'Visa', '4443123467891234', '808', '2022', '09' );
+	VALUES(1, 'Bobby Joe', '4443123467891234', '2022', '09' );
 INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(3, 'Nancy Johnson', 'Bank of America', 'Amex', '3734567891011121', '6290', '2024', '01' );
+	VALUES(3, 'Nancy Johnson', '3734567891011121', '2024', '01' );
 INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(2, 'Andrew Williams', 'HSBC', 'MasterCard', '4264483469273672', '700', '2026', '09' );
+	VALUES(2, 'Andrew Williams', '4264483469273672', '2026', '09' );
 INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(5, 'George Lee', 'Chase', 'Visa', '4231902528753161', '232', '2025', '11' );
+	VALUES(5, 'George Lee', '4231902528753161', '2025', '11' );
 INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(4, 'Jenny Jones', 'Wells Fargo', 'Amex', '3484127952481970', '1101', '2028', '10' );
+	VALUES(4, 'Jenny Jones', '3484127952481970', '2028', '10' );
 INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(3, 'Nancy Johnson', 'Discover', 'Discover', '6091862988814035', '444', '2027', '07' );
+	VALUES(3, 'Nancy Johnson', '6091862988814035', '2027', '07' );
 INSERT INTO credit_cards (user_id, cardholder_name, bank_name, card_type, card_number, security_code, expiration_year, expiration_month) 
-	VALUES(1, 'Bobby Joe', 'Citi', 'MasterCard', '4100360765536477', '121', '2023', '02' );
+	VALUES(1, 'Bobby Joe', '4100360765536477', '2023', '02' );
 
 INSERT INTO addresses (user_id, recipient_name, street, street2, city, state, zip, is_shipping, is_billing)
 	VALUES (1, 'Bobby Joe', '100 This st', 'Apt 20', 'Los Angeles', 'CA', '90025', 1, 1);
@@ -416,26 +408,26 @@ INSERT INTO products VALUES ('100001111111', 'Goldfish', 'Pepperidge Farm','Gold
 INSERT INTO products VALUES ('100011111111', 'Malk', 'Now With Vitamin R', 'Not actually milk', 'Drinks', 0.99, 'https://target.scene7.com/is/image/Target/GUEST_fc940329-105c-42ce-8c26-d3d34b1a51b4?wid=800&hei=800&qlt=80&fmt=pjpeg', 39, 3, 3);
 INSERT INTO products VALUES ('600000000002', 'Crystal Geyser', 'Crystal Geyser Water Company', 'Spring Water', 'Drinks', 0.99, 'https://images.heb.com/is/image/HEBGrocery/001966477', 121, 3, 5);
 
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (1, 1, 10.00, 1, '2011-12-18 13:17:17', '2011-12-18 13:17:17', NULL, 'Canceled');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (2, 2, 11.00, 2, '2012-12-18 13:17:17', '2012-12-18 13:17:17', '2012-12-20 13:17:17', 'Delivered');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (3, 3, 12.00, 3, '2013-12-18 13:17:17', '2013-12-18 13:17:17', '2013-12-20 13:17:17', 'Delivered');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (4, 4, 13.00, 4, '2014-12-18 13:17:17', '2014-12-18 13:17:17', NULL, 'Canceled');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (5, 5, 14.00, 5, '2015-12-18 13:17:17', '2015-12-18 13:17:17', NULL, 'Canceled');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (1, 1, 10.00, 1, '2015-12-18 13:17:17', '2015-12-18 13:17:17', '2015-12-20 13:17:17', 'Delivered');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (2, 2, 11.00, 2, '2016-12-18 13:17:17', '2016-12-18 13:17:17', '2016-12-20 13:17:17', 'Delivered');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (3, 3, 12.00, 3, '2017-12-18 13:17:17', '2017-12-18 13:17:17', NULL, 'Canceled');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (5, 5, 13.00, 5, '2018-12-17 13:17:17', '2018-12-18 13:17:17', NULL, 'Shipped');
-INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)
-	VALUES (5, 5, 14.00, 5, '2018-12-18 13:17:17', NULL, NULL, 'Pending');
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (1, 1, 10.00, 1, "2011-12-18 13:17:17", NULL, "Canceled");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (2, 2, 11.00, 2, "2012-12-18 13:17:17", "2012-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (3, 3, 12.00, 3, "2013-12-18 13:17:17", "2013-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (4, 4, 13.00, 4, "2014-12-18 13:17:17", "2014-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (5, 5, 14.00, 5, "2015-12-18 13:17:17", "2015-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (1, 1, 10.00, 1, "2015-12-18 13:17:17", "2015-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (2, 2, 11.00, 2, "2016-12-18 13:17:17", "2016-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (3, 3, 12.00, 3, "2017-12-18 13:17:17", "2017-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (5, 5, 13.00, 5, "2018-12-17 13:17:17", "2018-12-18 13:17:17", "Shipped");
+INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)
+	VALUES (5, 5, 14.00, 5, "2018-12-18 13:17:17", NULL, "Pending");
 
 INSERT INTO order_items (order_id, quantity, upc)
 	VALUES(6, 72, '100000001111'); 
