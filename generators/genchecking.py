@@ -30,8 +30,8 @@ def date_shipped(order_date):
     if d100 < 4: return ['NULL', "CANCELLED"]
     if (d100 < 50) and today == order_date: return ['NULL', "PENDING"]
     if (d100 >= 50) and today == order_date: return [today, "SHIPPED"]
-    if (d100 > 90): return [today + timedelta(1), "SHIPPED"]
-    if (d100 > 95): return [choice([today, today + timedelta(1)]), "CANCELLED"]
+    if (d100 > 70): return [today + timedelta(1), "SHIPPED"]
+    if (d100 > 85): return [choice([today, today + timedelta(1)]), "CANCELLED"]
     return [today, "SHIPPED"]
 
 
@@ -66,8 +66,8 @@ def generate_orders():
             d100 = randint(1,100)
             order_date = date_ordered(order_num)
             date_shipped_and_status = date_shipped(order_date)
-            print(date_shipped_and_status)
-            shipping_date = date_shipped_and_status
+            # print(date_shipped_and_status)
+            shipping_date = date_shipped_and_status[0]
             order_status = date_shipped_and_status[1]
             generate_order_for_user(user_id, order_date, shipping_date, order_status) #change to user
             
@@ -83,4 +83,18 @@ def generate_orders():
 
 generate_orders()
 
-print(orders)
+# print(orders)
+
+
+
+def print_orders():
+    string = ""
+    values = f"(user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)"
+    for i in range(len(orders)):
+        shipped_val = f"'{orders[i]['date_shipped']}'" 
+        user_id = orders[i]['preliminary_id'] if 'user_id' in orders[i] else i + 1
+        # string = string + f"INSERT INTO orders {values} VALUES({user_id}, {orders[i]['address_id']}, {orders[i]['price']}, {orders[i]['credit_card_id']}, '{orders[i]['date_ordered']}', {'NULL' if orders[i]['date_shipped'] == 'NULL' else f'{shipped_val}'}, {'NULL' if orders[i]['date_delivered'] == 'NULL' else f'{delivered_val}'}, '{orders[i]['order_status']}');\n"
+        string = string + f"{user_id}, '{orders[i]['date_ordered']}', {'NULL' if orders[i]['date_shipped'] == 'NULL' else f'{shipped_val}'}, '{orders[i]['order_status']}';\n"
+    print(string)
+
+print_orders()
