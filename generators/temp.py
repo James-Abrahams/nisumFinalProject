@@ -133,7 +133,6 @@ def generate_order_items(order_id, numItems):
 # end region
 
 
-
 #region CARTS
 def generate_carts():
     i = 0
@@ -147,12 +146,11 @@ def generate_carts():
                 while product in usedProducts:
                     product = choice(products)
                 #disallow products already in cart#
-                   
                 cart_item = {
                     "user_id": (user['user_id']), 
                     "product": product,
                     "quantity": randint(1, 10)
-                    }
+                }
             carts.append(cart_item)
 #end region
 
