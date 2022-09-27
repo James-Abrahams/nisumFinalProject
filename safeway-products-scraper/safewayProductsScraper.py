@@ -1,25 +1,65 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
 import pandas as pd
-import time
 import re
+import sys
+import time
+import os
+import multiprocessing as mp
 
 
 class SafewayProductsScraper:
     def __init__(self):
         self.out_fn = "safewayData.csv" # output data filename
-        self.items = ["milk", "chocolate", "juice", "cookies"] # list of items to scrape
-        self.cols = ["ProdName", "PricePerUnit", "ProdDescription", "ProdCode", "Category", "ImageURL"]
+        self.items = self.read_items("items.txt")
+        self.cols = ["ProdName", "Brand", "PricePerUnit", "Category", "Rating", "ProdDescription", "ProdCode", "ImageURL"]
         self.df = self.create_dataframe() # read in collected data into df, creates new df if not found
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+        os.environ['WDM_LOG_LEVEL'] = '0' # turn off webdriver logging
+        self.options = Options()
+        self.options.headless = True # run in headless mode
+        self.options.add_argument('--window-size=1920,1080')
+        self.options.add_argument('--no-sandbox')
 
-        self.scrape()
+        start_time = time.time()
+        p = mp.Pool(mp.cpu_count())
+        results = p.map(self.scrape, self.items)
+        end_time = time.time()
+        print(f"Time to scrape product details: {end_time - start_time}")
+
+        df_list = [item for sublist in results for item in sublist]
+        temp_df = pd.DataFrame(columns=self.cols, data=df_list)
+        self.df = pd.concat([self.df, temp_df])
+
+        # remove duplicate rows in df
+        self.df.drop_duplicates(keep='first',
+                                subset="ProdName",
+                                inplace=True)
         self.to_csv()
-        self.driver.quit()
+
+    # read items.txt line-by-line
+    # return list of items to scrape
+    def read_items(self, fn):
+        items = []
+        try:
+            with open(fn, 'r') as f:
+                items = f.read().splitlines()
+                items = [x for x in items if x]
+        except FileNotFoundError:
+            print(f"{fn} not found. Creating {fn} ...")
+            _ = open(fn, 'x')
+            print("Program terminated")
+            sys.exit()
+        if not items:
+            print(f"No items specified in {fn}. Please add items line-by-line.")
+            print("Program terminated")
+            sys.exit()
+        return items
 
     def create_dataframe(self):
         try:
@@ -31,80 +71,135 @@ class SafewayProductsScraper:
             print("Existing data file found, data read into dataframe")
         return df
 
-    def scrape(self):
-        for i, item in enumerate(self.items):
-            self.driver.get(f"https://safeway.com/shop/search-results.html?q={item}") # search item on safeway website
+    # returns a list of lists of values
+    def scrape(self, item):
+        print(f"Scraping product data for: {item}")
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
+        driver.get(f"https://safeway.com/shop/search-results.html?q={item}") # search item on safeway website
 
-            if i == 0: self.driver.get(f"https://safeway.com/shop/search-results.html?q={item}") # refresh page to get rid of pop-up
+        change_button = driver.find_element(By.XPATH, "/html/body/div[2]/div/div/div[1]/div/div/div/div/div[3]/div[2]/div[7]/div/div/div[1]/div[1]/button")
+        action = ActionChains(driver)
+        action.move_to_element_with_offset(change_button, 400, 600).click().perform()
+        # driver.implicitly_wait(3)
+        # driver.get(f"https://safeway.com/shop/search-results.html?q={item}") # refresh page to get rid of pop-up
 
-            # select each brand name individually
-            # /html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div[1]/search-facets/div/div[7]/div[2]/div[3]/div[2]/div/div[1]/div[1]/div/input
-            # /html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div[1]/search-facets/div/div[7]/div[2]/div[3]/div[2]/div/div[1]/div[2]/div/input
-            time.sleep(2)
-            matches = self.driver.find_elements(By.CLASS_NAME, "facet__label__text")
-            _ = [print(x.text) for x in matches]
+        time.sleep(1)
+        # # click load more 3 times
+        # for _ in range(3):
+        #     time.sleep(3)
+        #     # click load more to display even more products
+        #     load_more_button = driver.find_element(By.XPATH,
+        #         '/html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[2]/div[4]/div[2]/search-grid/div[4]/button')
+        #     actions = ActionChains(driver)
+        #     actions.move_to_element(load_more_button)
+        #     try:
+        #         load_more_button.click()
+        #     except NoSuchElementException:
+        #         break
 
-            # click load more 3 times
-            for _ in range(3):
-                time.sleep(2)
-                # click load more to display even more products
-                load_more_button = self.driver.find_element(By.XPATH,
-                    '/html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[2]/div[4]/div[2]/search-grid/div[4]/button')
-                actions = ActionChains(self.driver)
-                actions.move_to_element(load_more_button)
-                try:
-                    load_more_button.click()
-                except NoSuchElementException:
-                    break
+        # product name
+        name_elements = driver.find_elements(By.CLASS_NAME, 'product-title__name')
+        names = [e.text.strip() for e in name_elements]
+        if not name_elements:
+            print(f"No results found for: {item}")
+            return []
 
-            # product name
-            name_elements = self.driver.find_elements(By.CLASS_NAME, 'product-title__name')
-            names = [e.text for e in name_elements]
+        # price per unit
+        price_elements = driver.find_elements(By.CLASS_NAME, 'product-price__discounted-price')
+        prices = [e.text.replace('Your Price', '')
+                        .replace('each', '')
+                        .replace('$', '')
+                        .replace('\n', '') for e in price_elements]
 
-            # price per unit
-            price_elements = self.driver.find_elements(By.CLASS_NAME, 'product-price__discounted-price')
-            prices = [e.text.replace('Your Price', '')
-                            .replace('each', '')
-                            .replace('$', '')
-                            .replace('\n', '') for e in price_elements]
+        # price per unit amount (weight/vol)
+        # ppu_elements = driver.find_elements(By.CLASS_NAME, 'product-title__qty')
+        # ppus = [e.text.replace('($', '').replace(')', '') for e in ppu_elements]
 
-            # price per unit amount (weight/vol)
-            # ppu_elements = self.driver.find_elements(By.CLASS_NAME, 'product-title__qty')
-            # ppus = [e.text.replace('($', '').replace(')', '') for e in ppu_elements]
+        # product image url
+        img_elements = driver.find_elements(By.CLASS_NAME, 'product-card-container__product-image')
+        img_urls = [e.get_attribute("data-src")[2:] for e in img_elements]
 
-            # product image url
-            img_elements = self.driver.find_elements(By.CLASS_NAME, 'product-card-container__product-image')
-            img_urls = [e.get_attribute("data-src")[2:] for e in img_elements]
-
-            # product category
-            category = self.driver.find_element(By.XPATH,
+        # product category
+        try:
+            category = driver.find_element(By.XPATH,
                 '/html/body/div[2]/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div[1]/search-facets/div/div[7]/div[2]/div[2]/div[2]/department-filter/div/div[1]/div/span').text
+        except NoSuchElementException:
+            category = 'Other'
+        else:
             category = category.strip()
             pattern = re.compile(r'([\s\S]*) \(')
             matches = re.findall(pattern, category)
             category = matches[0]
 
-            current_item_data = list(zip(
-                                names,
-                                prices,
-                                ["-"]*len(names), # dash for product description column
-                                [self.get_product_code(url) for url in img_urls], # extract product code from img urls
-                                [category]*len(names),
-                                img_urls))
+        # product brand
+        brands_list = self.get_brands_list(item, driver)
+        brands = [self.get_product_brand(name, brands_list) for name in names]
 
-            temp_df = pd.DataFrame(data=current_item_data,
-                                   columns=self.cols)
-            self.df = pd.concat([self.df, temp_df])
+        # product rating
+        ratings = self.get_product_ratings(driver)
 
-        # remove duplicate rows in df
-        self.df.drop_duplicates(keep='first',
-                                subset="ProdName",
-                                inplace=True)
+        driver.quit()
+
+        current_item_data = list(zip(
+                            names,
+                            brands,
+                            prices,
+                            [category] * len(names),
+                            ratings,
+                            ["-"]*len(names), # dash for product description column
+                            [self.get_product_code(url) for url in img_urls], # extract product code from img urls
+                            img_urls))
+
+        temp_df = pd.DataFrame(data=current_item_data,
+                               columns=self.cols)
+        temp_list = temp_df.values.tolist()
+        return temp_list
 
     def get_product_code(self, img_url):
         pattern = re.compile(r'ABS/([0-9]*)\?')
         matches = re.findall(pattern, img_url)
         return matches[0]
+
+    # return list of brands of item (e.g. milk, eggs, etc)
+    def get_brands_list(self, item, driver):
+        brands = []
+        html = driver.page_source
+        soup = BeautifulSoup(html, 'lxml')
+        brand_list = soup.find("div", {"id": "brand"})
+        result = brand_list.find_all('span', attrs={'class': "facet__label__text"})
+        for x in result:
+            brands.append(x.text.strip())
+        return brands
+
+    # return product's brand
+    def get_product_brand(self, prod_name, brands_list):
+        name_words = prod_name.split() # store words in prod_name into list
+        for brand in brands_list:
+            brand_words = brand.split() # store words in brand name into list
+
+            # compare first word in product name to first word in brand name
+            name_first_word = ''.join(filter(str.isalnum, name_words[0])).lower()
+            brand_first_word = ''.join(filter(str.isalnum, brand_words[0])).lower()
+
+            if name_first_word == brand_first_word:
+                return brand
+
+        # no brand matches, return "-"
+        return name_words[0]
+
+    def get_product_ratings(self, driver):
+        html = driver.page_source
+        soup = BeautifulSoup(html, 'lxml')
+        rows = soup.find_all('div', attrs={'class': "product-card-container product-card-container--with-out-ar"})
+        ratings = []
+        for row in rows:
+            rating_element = row.find('div', attrs={'class': "product-card-container__star-icon"})
+            if not rating_element:
+                rating = "5.0"  # maybe random
+            else:
+                rating = rating_element.text.strip()
+            ratings.append(rating)
+        return ratings
 
     # writes dataframe to csv file
     def to_csv(self):
@@ -113,4 +208,4 @@ class SafewayProductsScraper:
                        header=True,
                        index=False,
                        sep=",")
-        print(f"Data saved in {self.out_fn}")
+        print(f"{len(self.df)} rows saved in {self.out_fn}\n")
