@@ -8,7 +8,7 @@ fake = Faker()
 
 
 #region GENERAL
-num_users = 100
+num_users = 20
 num_products = 5
 
 #endregion
@@ -56,7 +56,7 @@ def print_users():
     print(string)
 
 generate_users(num_users)
-# print_users()
+print_users()
 # print(user_list)
 # print(len(user_list))
 # endregion
@@ -114,7 +114,7 @@ def print_credit_cards():
     print(string)
 
 generate_credit_cards(num_users)
-# print_credit_cards()
+print_credit_cards()
 # print(len(cards))
 # endregion
 
@@ -158,7 +158,6 @@ def generate_addresses_for_user(num_addresses, user):
     has_shipping = 0
     has_billing = 0
 
-    
     while (has_shipping == 0 or has_billing == 0) or i < num_addresses:
         if num_addresses == 1:
             shipping_billing = ship_bill(1,1)
@@ -183,17 +182,13 @@ def generate_addresses_for_user(num_addresses, user):
         if who_receives[1] == False or (who_receives[1] == True and i > 0):
             address['is_shipping'] = shipping_billing_split.pop(choice([0,1,1]))
             address['is_billing'] = choice(shipping_billing_split)
-        # print(user['first_name'] + ' ' + user['last_name'], address)
         addresses.append(address)
         
         if address['is_shipping'] == 1:
             has_shipping = 1
         if address['is_billing'] == 1:
             has_billing = 1
-
-
         i += 1
-
 
 def generate_addresses(num_users):
     addresses.clear()
@@ -213,8 +208,8 @@ def print_addresses():
     print(string)
 
 generate_addresses(num_users)
-# print_addresses()
-print(len(addresses))
+print_addresses()
+# print(len(addresses))
 # endregion
 
 
