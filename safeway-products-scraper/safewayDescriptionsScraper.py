@@ -45,7 +45,7 @@ class SafewayDescriptionsScraper:
             print("Could not find description for:", prod_code)
             dx = "-"
         else:
-            dx = dx_top + 2*'\n' + dx_bot
+            dx = dx_top + '\n' + dx_bot
 
         # replace '-' in ProdDescription with its description if found; set as '-' if not found
         row[self.prod_dx_index] = dx
