@@ -18,6 +18,7 @@ class SafewayDescriptionsScraper:
 
         start_time = time.time()
         p = mp.Pool(mp.cpu_count())
+        print("Scraping product descriptions...")
         results = p.map(self.get_description, self.df_list)
         end_time = time.time()
         print(f"Time to scrape product descriptions: {end_time - start_time}")
@@ -38,14 +39,27 @@ class SafewayDescriptionsScraper:
         page = requests.get(url)
         soup = BeautifulSoup(page.content, "html.parser")
         dom = etree.HTML(str(soup))
-        try:
-            dx_top = dom.xpath('/html/body/div[2]/div/div/div[2]/div/div/div/div/div/div/div/div[2]/div[3]/div/div[3]/div[2]/div[1]/p[1]')[0].text.strip()
-            dx_bot = dom.xpath('/html/body/div[2]/div/div/div[2]/div/div/div/div/div/div/div/div[2]/div[3]/div/div[3]/div[2]/div[1]/p[2]')[0].text.strip()
-        except IndexError:
-            print("Could not find description for:", prod_code)
-            dx = "-"
+
+        placeholder = "Foods, Inc."
+
+        dx_top_elements = dom.xpath(
+            '/html/body/div[2]/div/div/div[2]/div/div/div/div/div/div/div/div[2]/div[3]/div/div[3]/div[2]/div[1]/p[1]')
+        dx_bot_elements = dom.xpath(
+            '/html/body/div[2]/div/div/div[2]/div/div/div/div/div/div/div/div[2]/div[3]/div/div[3]/div[2]/div[1]/p[2]')
+
+        if dx_top_elements:
+            dx_top = dx_top_elements[0].text.strip()
         else:
-            dx = dx_top + '\n' + dx_bot
+            dx_top = placeholder
+            print(f"Missing top description for: {prod_code}")
+
+        if dx_bot_elements:
+            dx_bot = dx_bot_elements[0].text.strip()
+        else:
+            dx_bot = placeholder
+            print(f"Missing bottom description for: {prod_code}")
+
+        dx = dx_top + '\n' + dx_bot
 
         # replace '-' in ProdDescription with its description if found; set as '-' if not found
         row[self.prod_dx_index] = dx

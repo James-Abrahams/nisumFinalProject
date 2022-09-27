@@ -16,31 +16,37 @@ import multiprocessing as mp
 
 class SafewayProductsScraper:
     def __init__(self):
+        self.items = self.read_items("items.txt") # txt file containing products to scrape on Safeway's website, line-by-line
+        # group items in self.items
+        items_per_group = mp.cpu_count()
+        self.items = [self.items[n:n + items_per_group] for n in range(0, len(self.items), items_per_group)]
         self.out_fn = "safewayData.csv" # output data filename
-        self.items = self.read_items("items.txt")
         self.cols = ["ProdName", "Brand", "PricePerUnit", "Category", "Rating", "ProdDescription", "ProdCode", "ImageURL"]
-        self.df = self.create_dataframe() # read in collected data into df, creates new df if not found
         os.environ['WDM_LOG_LEVEL'] = '0' # turn off webdriver logging
         self.options = Options()
         self.options.headless = True # run in headless mode
         self.options.add_argument('--window-size=1920,1080')
         self.options.add_argument('--no-sandbox')
+        self.options.add_argument('--user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"')
 
         start_time = time.time()
-        p = mp.Pool(mp.cpu_count())
-        results = p.map(self.scrape, self.items)
+
+        # for each group of items, read in data from csv data file
+        for items in self.items:
+            self.df = self.create_dataframe() # read in collected data into df, creates new df if not found
+            p = mp.Pool(items_per_group)
+            results = p.map(self.scrape, items)
+            df_list = [item for sublist in results for item in sublist]
+            temp_df = pd.DataFrame(columns=self.cols, data=df_list)
+            self.df = pd.concat([self.df, temp_df])
+
+            # remove duplicate rows in df
+            self.df.drop_duplicates(keep='first',
+                                    subset="ProdName",
+                                    inplace=True)
+            self.to_csv()
         end_time = time.time()
         print(f"Time to scrape product details: {end_time - start_time}")
-
-        df_list = [item for sublist in results for item in sublist]
-        temp_df = pd.DataFrame(columns=self.cols, data=df_list)
-        self.df = pd.concat([self.df, temp_df])
-
-        # remove duplicate rows in df
-        self.df.drop_duplicates(keep='first',
-                                subset="ProdName",
-                                inplace=True)
-        self.to_csv()
 
     # read items.txt line-by-line
     # return list of items to scrape
@@ -83,7 +89,8 @@ class SafewayProductsScraper:
         # driver.implicitly_wait(3)
         # driver.get(f"https://safeway.com/shop/search-results.html?q={item}") # refresh page to get rid of pop-up
 
-        time.sleep(1)
+        time.sleep(3)
+
         # # click load more 3 times
         # for _ in range(3):
         #     time.sleep(3)
