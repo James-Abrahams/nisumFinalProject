@@ -8,8 +8,8 @@ fake = Faker()
 
 
 #region GENERAL
-num_users = 200
-
+num_users = 100
+num_products = 5
 
 #endregion
 
@@ -56,7 +56,7 @@ def print_users():
     print(string)
 
 generate_users(num_users)
-print_users()
+# print_users()
 # print(user_list)
 # print(len(user_list))
 # endregion
@@ -114,15 +114,13 @@ def print_credit_cards():
     print(string)
 
 generate_credit_cards(num_users)
-print_credit_cards()
+# print_credit_cards()
 # print(len(cards))
 # endregion
 
 # region ADDRESSES
 addresses = []
-
-def ship_bill():
-    return [True, True]
+states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
 def street_parser():
     get_street = fake.street_address()
@@ -132,20 +130,43 @@ def street_parser():
     if len(street_arr) > 3:
         street2 = " ".join(street_arr[3:])
     return [street1, street2]
-states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
 def recipient_name(first_name = fake.first_name(), last_name = fake.last_name()): 
     fname = first_name
     lname = last_name
     return f"{fname} {lname}"
 
+def who_is_recipient(user):
+    random_int = randint(1,100)
+    is_self = False
+    name = ''
+    if random_int < 85:
+        name = recipient_name(user['first_name'], user['last_name'])
+        is_self = True
+    elif random_int < 94:
+        name = recipient_name(last_name = user['last_name'])
+    else:
+        name = recipient_name()    
+    return [name, is_self]
+
+
+def ship_bill(is_shipping = False, is_billing = False):
+    return [is_shipping, is_billing]
+
 def generate_addresses_for_user(num_addresses, user):
     i = 0
-    while i < num_addresses:
-        shipping_billing = ship_bill()
+    has_shipping = 0
+    has_billing = 0
+
+    
+    while (has_shipping == 0 or has_billing == 0) or i < num_addresses:
+        if num_addresses == 1:
+            shipping_billing = ship_bill(1,1)
+        else:
+            shipping_billing = ship_bill(0,0)
+
         parsed_street = street_parser()
         address = {
-            "address_id"     : i + 1, #CHANGE
             "user_id"        : user['user_id'],
             "recipient_name" : '',
             "street"         : parsed_street[0],
@@ -156,24 +177,31 @@ def generate_addresses_for_user(num_addresses, user):
             "is_shipping"    : shipping_billing[0],
             "is_billing"     : shipping_billing[1],
         }
-        random_int = randint(1,100)
-        if random_int < 84:
-            address['recipient_name'] = recipient_name(user['first_name'], user['last_name'])
-        elif random_int < 94:
-            address['recipient_name'] = recipient_name(last_name = user['last_name'])
-        else:
-            address['recipient_name'] = recipient_name()
+        who_receives = who_is_recipient(user)
+        address['recipient_name'] = who_receives[0]
+        shipping_billing_split = [0,1,1]
+        if who_receives[1] == False or (who_receives[1] == True and i > 0):
+            address['is_shipping'] = shipping_billing_split.pop(choice([0,1,1]))
+            address['is_billing'] = choice(shipping_billing_split)
+        # print(user['first_name'] + ' ' + user['last_name'], address)
         addresses.append(address)
+        
+        if address['is_shipping'] == 1:
+            has_shipping = 1
+        if address['is_billing'] == 1:
+            has_billing = 1
+
+
         i += 1
+
 
 def generate_addresses(num_users):
     addresses.clear()
     i = 0
     while i < num_users:
+        num_addresses = choice([1,1,1,1,1,2,2])
         user = user_list[i]
-        num_addresses_for_user = choice([1,1,1,2,3])
-        # num_addresses_for_user = 10
-        generate_addresses_for_user(num_addresses_for_user, user)
+        generate_addresses_for_user(num_addresses, user)
         i += 1
 
 def print_addresses():
@@ -181,12 +209,12 @@ def print_addresses():
     values = f"(user_id, recipient_name, street, street2, city, state, zip, is_shipping, is_billing)"
     for i in range(len(addresses)):
         street2_val = f"'{addresses[i]['street2']}'"
-        string = string + f"INSERT INTO addresses {values} VALUES({addresses[i]['address_id']}, {addresses[i]['user_id'] if 'user_id' in addresses[i] else i + 1}, '{addresses[i]['recipient_name']}', '{addresses[i]['street']}', {'NULL' if addresses[i]['street2'] == 'NULL' else f'{street2_val}'}, '{addresses[i]['city']}', '{addresses[i]['state']}', '{addresses[i]['zip']}', {addresses[i]['is_shipping']}, {addresses[i]['is_billing']});\n"
+        string = string + f"INSERT INTO addresses {values} VALUES({addresses[i]['user_id'] if 'user_id' in addresses[i] else i + 1}, '{addresses[i]['recipient_name']}', '{addresses[i]['street']}', {'NULL' if addresses[i]['street2'] == 'NULL' else f'{street2_val}'}, '{addresses[i]['city']}', '{addresses[i]['state']}', '{addresses[i]['zip']}', {addresses[i]['is_shipping']}, {addresses[i]['is_billing']});\n"
     print(string)
 
 generate_addresses(num_users)
-print_addresses()
-# print(len(addresses))
+# print_addresses()
+print(len(addresses))
 # endregion
 
 
