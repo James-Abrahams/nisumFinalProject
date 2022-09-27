@@ -9,6 +9,8 @@ fake = Faker()
 #region OLD CODE TO MAKE IT PRETTY
 print(fake.date())
 orders = []
+carts = []
+order_items = []
 today = date.today()
 today = str(today).split("-")
 print(today)
@@ -78,9 +80,10 @@ def generate_orders():
         while i < numUserOrders:
             orderDates = getOrderDates()
             order = {
+                "order_id"        : i+1,
                 "user_id"         : user['user_id'],
                 "address_id"      : getOrderAddress(user['user_id']),
-                "price"           : round(randint(0, 300) + 0.99 * randint(1, 30), 2),
+                "price"           : -1,
                 "credit_card_id"  : getOrderCard(user['user_id']),
                 "date_ordered"    : orderDates['ordered'],
                 "date_shipped"    : orderDates['shipped'], 
@@ -89,7 +92,9 @@ def generate_orders():
 
             orders.append(order)
             i += 1
-            price = generate_order_items_per_order(order[id])
+            numOrderItems = randint(1,30)
+            price = generate_order_items(i+1)
+            orders[i+1]['price'] = price
         print(orders)
 
     generate_orders(10)
@@ -110,6 +115,46 @@ def print_orders():
 
 
 
+#region ORDER ITEMS
+def generate_order_items(order_id, numItems):
+    totalPrice = 0
+    for i in range(numItems):
+        quantity = randint(1, 10)
+        product = choice('products')
+        order_item = {
+            "order_id": order_id,
+            "product_id": product['product_id'],
+            "quantity": quantity
+        }
+        totalPrice += (quantity*product['price'])
+        order_items.append(order_item)
+        print(order_item)
+    return round(totalPrice, 2)
+# end region
+
+
+
+#region CARTS
+def generate_carts():
+    i = 0
+    for user in user_list:
+        numCartItems = choices([randint(1,15), 0], [50, 50])[0]
+        usedProducts = set()
+        if numCartItems != 0:
+            for i in range(numCartItems):
+                product = choice(products)
+                #disallow products already in cart#
+                while product in usedProducts:
+                    product = choice(products)
+                #disallow products already in cart#
+                   
+                cart_item = {
+                    "user_id": (user['user_id']), 
+                    "product": product,
+                    "quantity": randint(1, 10)
+                    }
+            carts.append(cart_item)
+#end region
 
 
 
@@ -159,32 +204,3 @@ print_users()
 # print(user_list)
 # print(len(user_list))
 # endregion
-
-
-
-
-#justin
-
-
-x_num_orders = 10
-def x_rand_days():
-    return choice([0, randint(0,4)])
-
-for i in range(x_num_orders):
-    
-
-
-
-
-
-
-    ordered = fake.date_between_dates(date_start=datetime(2018,1,1), date_end=datetime(2022,9,16))
-    to_ship_time = (ordered + timedelta(days=rand_days()))
-    shipped = choices(['NULL', to_ship_time], [100, 99])[0]
-    if shipped != 'NULL':
-        delivered = choices(['NULL' , shipped + timedelta(days=rand_days())], [200, 98])[0]
-    else:
-        delivered = 'NULL'
-    order_times.append({'ordered': str(ordered), 'shipped': str(shipped), 'delivered': str(delivered)})
-    # print('ordered: ', ordered, 'shipped: ', shipped, 'delivered: ', delivered, end = '\n')
-print(order_times)
