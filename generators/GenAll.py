@@ -80,6 +80,7 @@ def generate_cards_for_user(num_cards, user):
         random_int = randint(1,100)
         exp = fake.credit_card_expire().split("/")
         card = {
+            "card_id"               : i + 1,
             "user_id"               : user['user_id'], #CHANGEME make this depend on shipping and billing results + chance of extra
             "cardholder_name"       : "", #later tie this to person name with logic, chance of other esp if extra
             "last_four_card_number" : str(fake.credit_card_number())[-4:],
@@ -166,6 +167,7 @@ def generate_addresses_for_user(num_addresses, user):
 
         parsed_street = street_parser()
         address = {
+            "address_id"     : i + 1,
             "user_id"        : user['user_id'],
             "recipient_name" : '',
             "street"         : parsed_street[0],
