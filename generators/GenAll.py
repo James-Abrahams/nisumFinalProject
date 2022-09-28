@@ -8,7 +8,13 @@ import string
 
 fake = Faker()
 df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
-df["ProdDescription"] = df["ProdDescription"].str.replace(r"'", r"\'")
+for col in list(df.columns):
+    try:
+        df[col] = df[col].str.replace(r"'", r"\'")
+    except AttributeError:
+        print(col)
+        continue
+
 
 # f = open("super_db_seed.txt", "w") #9901
 f = open("super_db_seed_mini.txt", "w") #4 users
