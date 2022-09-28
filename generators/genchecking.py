@@ -260,7 +260,7 @@ def print_products():
     string = ""
     values = f"(upc, prod_name, prod_description, brand, category, price_per_unit, image_url, available_stock, reserved_stock, shipped_stock)"
     for i in range(len(products)):
-        string = string + f"INSERT INTO products VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['prod_description']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']},);\n"
+        string = string + f"INSERT INTO products VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['prod_description']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']});\n"
         # string = string + f"INSERT INTO products VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']},);\n"
     # print(string)
     f.write(string)
@@ -360,9 +360,9 @@ def generate_carts():
 
 def print_carts():
     string = ""
-    values = f"(user_id, quantity, product)"
+    values = f"(user_id, quantity, upc)"
     for i in range(len(carts)):
-        string = string + f"INSERT INTO carts {values} VALUES({carts[i]['user_id']}, {carts[i]['quantity']}, '{carts[i]['upc']}');\n"
+        string = string + f"INSERT INTO cart_items {values} VALUES({carts[i]['user_id']}, {carts[i]['quantity']}, '{carts[i]['upc']}');\n"
     f.write(string)
 
 generate_carts()
@@ -396,7 +396,7 @@ def generate_order_for_user(order_num, user, order_date, shipping_date, order_st
         "address_id"      : choice(possible_addresses),
         "price"           : -1,
         "credit_card_id"  : choice(possible_credit_cards),
-        'pre_id'  : order_num, 
+        'pre_id'          : order_num, 
         "date_ordered"    : order_date,
         "date_shipped"    : shipping_date,
         "order_status"    : order_status,
@@ -454,7 +454,7 @@ def generate_orders(num_users):
 
 def print_orders():
     string = ""
-    values = f"(user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)"
+    values = f"(user_id, address_id, price, credit_card_id, date_ordered, date_shipped, order_status)"
     for i in range(len(orders)):
         shipped_val = f"'{orders[i]['date_shipped']}'" 
         user_id = orders[i]['user_id']
