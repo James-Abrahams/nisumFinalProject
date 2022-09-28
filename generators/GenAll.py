@@ -8,6 +8,8 @@ import string
 
 fake = Faker()
 df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
+df["ProdDescription"] = df["ProdDescription"].str.replace(r"'", r"\'")
+
 # f = open("super_db_seed.txt", "w") #9901
 f = open("super_db_seed_mini.txt", "w") #4 users
 states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
@@ -213,7 +215,8 @@ def generate_products():
     products.clear()
     
     codes = list(df['ProdCode'])
-    # codes = codes[:30]
+    random_products = randint(1, 1750) ##################
+    codes = codes[random_products:random_products+30]####
     for code in codes:
         row = df.loc[df['ProdCode'] == code]
         product = {
