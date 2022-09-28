@@ -18,7 +18,7 @@ orders = []
 carts = []
 order_items = []
 products = []
-user_list = []
+users = []
 cards = []
 
 
@@ -36,7 +36,7 @@ def phone():
 
 
 def generate_users(num_users):
-    user_list.clear()
+    users.clear()
     for i in range(0, num_users):
         fname = fake.first_name()
         mname = fake.first_name()
@@ -54,18 +54,18 @@ def generate_users(num_users):
             "phone"         : phone(),
         }       
 
-        user_list.append(person)
+        users.append(person)
 
 def print_users():
     string = ""
     values = f"(email, first_name, last_name, user_password, phone)"
-    for i in range(len(user_list)):
-        string = string + f"INSERT INTO users {values} VALUES ('{user_list[i]['email']}', '{user_list[i]['first_name']}', '{user_list[i]['last_name']}', '{user_list[i]['user_password']}', '{user_list[i]['phone']}');\n"
+    for i in range(len(users)):
+        string = string + f"INSERT INTO users {values} VALUES ('{users[i]['email']}', '{users[i]['first_name']}', '{users[i]['last_name']}', '{users[i]['user_password']}', '{users[i]['phone']}');\n"
     print(string)
 
 generate_users(num_users)
 # print_users()
-# print(user_list)
+# print(users)
 # endregion
 
 # region CREDIT
@@ -109,7 +109,7 @@ def generate_credit_cards(num_users):
     i = 0
     card_id = 1
     while i < num_users:
-        user = user_list[i]
+        user = users[i]
         num_cards_for_user = choice([1,1,1,1,2,3])
         # num_cards_for_user = 10
         cards_generated = generate_cards_for_user(card_id, num_cards_for_user, user)
@@ -209,7 +209,7 @@ def generate_addresses(num_users):
     address_id = 1
     while i < num_users:
         num_addresses = choice([1,1,1,1,1,2,2])
-        user = user_list[i]
+        user = users[i]
         addresses_generated = generate_addresses_for_user(address_id, num_addresses, user)
         i += 1
         address_id += addresses_generated
@@ -312,9 +312,17 @@ def generate_order_items(order_id, numItems):
         order_items.append(order_item)
     return round(totalPrice, 2)
 
+def print_order_items():
+    string = ""
+    values = f"(order_id, quantity, upc)"
+    for i in range(len(order_items)):
+        string = string + f"INSERT INTO order_items {values} VALUES({order_items[i]['order_id']}, {order_items[i]['quantity']}, '{order_items[i]['upc']}');\n"
+    print(string)
+
+
 def generate_carts():
     i = 0
-    for user in user_list:
+    for user in users:
         numCartItems = choices([randint(1,15), 0], [50, 50])[0]
         usedProducts = set()
         if numCartItems != 0:
@@ -391,7 +399,7 @@ def generate_orders(num_users):
     order_num = 1
 
     while user_idx < num_users:
-        user = user_list[user_idx]
+        user = users[user_idx]
         possible_addresses = getOrderAddress(user['user_id'])
         possible_credit_cards = getOrderCard(user['user_id'])
         did_all_orders = False
@@ -430,14 +438,18 @@ generate_orders(num_users)
 
 
 
-# print_users()
-# print(user_list)
-# print_credit_cards()
-# print_addresses()
+print_users()
+print_credit_cards()
+print_addresses()
 print_carts()
-# print_orders()
+print_products()
+print_orders()
+print_order_items()
 
-# for card in cards: print(card)
-# for address in addresses: print(address)
-# for order in orders: print(order)
-# for items in order_items: print(items)
+# for user in users:          print(user)
+# for card in cards:          print(card)
+# for address in addresses:   print(address)
+# for cart_item in carts:     print (cart_item)
+# for product in products:    print(product)
+# for order in orders:        print(order)
+# for items in order_items:   print(items)
