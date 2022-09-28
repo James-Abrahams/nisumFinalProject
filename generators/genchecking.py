@@ -8,9 +8,10 @@ import string
 
 fake = Faker()
 df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
-f = open("super_db_seed.txt", "w") 
+# f = open("super_db_seed.txt", "w") #9901
+f = open("super_db_seed_mini.txt", "w") #4 users
 
-num_users = 9001
+num_users = 4
 num_products_more_or_less = 15
 today = date.today()
 # print("today: ", today)
