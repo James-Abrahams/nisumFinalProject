@@ -9,7 +9,7 @@ import string
 fake = Faker()
 df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
 
-num_users = 30000
+num_users = 9001
 num_products_more_or_less = 15
 today = date.today()
 # print("today: ", today)
@@ -275,18 +275,26 @@ generate_products()
 
 
 ####
-def getOrderAddress(userId):
+def getOrderAddress(start_index, userId):
     possAddresses = []
-    for address in addresses:
+    address_range = len(addresses)
+    for i in range(start_index, address_range):
+        address = addresses[i]
         if address['user_id'] == userId:
             possAddresses.append(address['address_id'])
+        else:
+            break
     return possAddresses
 
-def getOrderCard(userId):
+def getOrderCard(start_index, userId):
     possCards = []
-    for card in cards:
+    card_range = len(cards)
+    for i in range(start_index, card_range):
+        card = cards[i]
         if card['user_id'] == userId:
             possCards.append(card['card_id'])
+        else:
+            break
     #return random address from user
     # print ("Cards options: ", possCards)
     return possCards
@@ -381,7 +389,7 @@ def generate_order_for_user(order_num, user, order_date, shipping_date, order_st
         "address_id"      : choice(possible_addresses),
         "price"           : -1,
         "credit_card_id"  : choice(possible_credit_cards),
-        'preliminary_id'  : order_num, 
+        'pre_id'  : order_num, 
         "date_ordered"    : order_date,
         "date_shipped"    : shipping_date,
         "order_status"    : order_status,
@@ -398,21 +406,32 @@ def generate_orders(num_users):
     orders.clear()
     user_idx = 0
     order_num = 1
+    start_index_addresses = 0
+    start_index_cards = 0
 
     while user_idx < num_users:
         user = users[user_idx]
-        possible_addresses = getOrderAddress(user['user_id'])
-        possible_credit_cards = getOrderCard(user['user_id'])
+        possible_addresses = getOrderAddress(start_index_addresses, user['user_id'])
+        start_index_addresses += len(possible_addresses)
+
+        possible_credit_cards = getOrderCard(start_index_cards, user['user_id'])
+        start_index_cards += len(possible_credit_cards)
         
         user_order_num = 1
         did_all_orders = False
         while did_all_orders == False:
             d100 = randint(1,100)
+            
+            
             order_date = date_ordered(user_order_num)
             date_shipped_and_status = date_shipped(order_date)
+            
+            
             shipping_date = date_shipped_and_status[0]
             order_status = date_shipped_and_status[1]
             generate_order_for_user(order_num, user, order_date, shipping_date, order_status, possible_addresses, possible_credit_cards)
+            
+            
             
             if d100 > 92 or user_order_num == 240:
             # if d100 > 0:
@@ -421,6 +440,9 @@ def generate_orders(num_users):
                 user_order_num = 1
 
             user_order_num += 1
+            order_num += 1
+
+
 
 
 def print_orders():
@@ -436,28 +458,48 @@ generate_orders(num_users)
 
 
 def sort_orders():
-    orders.sort(key = lambda order: datetime.strptime(str(order['date_ordered']), "%Y-%m-%d"), reverse=True)
+    orders.sort(key = lambda order: datetime.strptime(str(order['date_ordered']), "%Y-%m-%d")) #, reverse=True)
 sort_orders()
 
 
 def give_ids_to_orders():
     for i in range(len(orders)):
         orders[i]['order_id'] = i + 1
+give_ids_to_orders()
 
+red = 1
+def match_order_item_ids():
+    id_dict = {}
+    for order in orders:
+        id_dict[order['pre_id']] = order['order_id']
+    for item in order_items:
+        item['order_id'] = id_dict[item['pre_id']]
+        
+   
+match_order_item_ids()
+
+def sort_order_items():
+    order_items.sort(key = lambda item: item['order_id']) #, reverse=True)
+
+sort_order_items()
+# {'order_id': 19, 'user_id': 1, 'address_id': 3, 'price': 397.33, 'credit_card_id': 1, 
+# 'pre_id': 1, 'date_ordered': datetime.date(2022, 9, 28), 'date_shipped': 'NULL', 'order_status': 'PENDING'}
+
+# {'order_id': 19, 
+# 'pre_id': 1, 'upc': 960223425, 'quantity': 1}
 
 # def sort_order_items():
 #     orders.sort(key = lambda x: x['order_id'], reverse=True)
-give_ids_to_orders()
 # sort_order_items()
 
 
-# print_users()
-# print_credit_cards()
-# print_addresses()
-# print_carts()
 # print_products()
+print_users()
+print_credit_cards()
+print_addresses()
+print_carts()
 print_orders()
-# print_order_items()
+print_order_items()
 
 # for user in users:          print(user)
 # for card in cards:          print(card)
