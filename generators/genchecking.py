@@ -1,4 +1,4 @@
-from random import randint, choice, choices
+from random import randint, choice, choices, shuffle
 from faker import Faker
 from faker_food import FoodProvider
 import pandas as pd
@@ -9,7 +9,7 @@ import string
 fake = Faker()
 df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
 
-num_users = 2
+num_users = 20
 num_products_more_or_less = 15
 today = date.today()
 # print("today: ", today)
@@ -234,7 +234,7 @@ def generate_products():
     products.clear()
     
     codes = list(df['ProdCode'])
-    codes = codes[:10]
+    codes = codes[:21]
     for code in codes:
         row = df.loc[df['ProdCode'] == code]
         product = {
@@ -294,10 +294,15 @@ def getOrderCard(userId):
 
 def generate_order_items(order_id, numItems):
     totalPrice = 0
+    usedProducts = set()
     for i in range(numItems):
         quantity = randint(1, 6)
-        # print(products)
         product = choice(products)
+        #disallow products already in cart#
+        while product['upc'] in usedProducts:
+            product = choice(products)
+        usedProducts.add(product['upc'])
+        #disallow products already in cart#
         order_item = {
             "order_id"  : order_id,
             "upc"       : product['upc'],
@@ -305,7 +310,6 @@ def generate_order_items(order_id, numItems):
         }
         totalPrice += (quantity*product['price_per_unit'])
         order_items.append(order_item)
-        # print(order_item)
     return round(totalPrice, 2)
 
 def generate_carts():
@@ -317,18 +321,27 @@ def generate_carts():
             for i in range(numCartItems):
                 product = choice(products)
                 #disallow products already in cart#
-                while product in usedProducts:
+                while product['upc'] in usedProducts:
                     product = choice(products)
+                usedProducts.add(product['upc'])
                 #disallow products already in cart#
                    
                 cart_item = {
                     "user_id": (user['user_id']), 
-                    "product": product,
+                    "upc": product['upc'],
                     "quantity": randint(1, 10)
                     }
-            carts.append(cart_item)
+                carts.append(cart_item)
+    shuffle(carts)
 
+def print_carts():
+    string = ""
+    values = f"(user_id, quantity, product)"
+    for i in range(len(carts)):
+        string = string + f"INSERT INTO carts {values} VALUES({carts[i]['user_id']}, {carts[i]['quantity']}, '{carts[i]['upc']}');\n"
+    print(string)
 
+generate_carts()
 ###
 
 def date_ordered(order_num):
@@ -364,8 +377,7 @@ def generate_order_for_user(order_num, user, order_date, shipping_date, order_st
         "date_shipped"    : shipping_date,
         "order_status"    : order_status,
     }      
-    # id = order['preliminary_id']
-    # price = generate_order_items_per_order(order[id])
+
     num_order_items = randint(1,20)
     price = generate_order_items(order_num, num_order_items)
     order['price'] = price
@@ -421,11 +433,11 @@ generate_orders(num_users)
 # print_users()
 # print(user_list)
 # print_credit_cards()
-
-
+# print_addresses()
+print_carts()
 # print_orders()
 
 # for card in cards: print(card)
 # for address in addresses: print(address)
 # for order in orders: print(order)
-for items in order_items: print(items)
+# for items in order_items: print(items)
