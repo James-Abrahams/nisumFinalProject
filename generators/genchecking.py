@@ -8,6 +8,7 @@ import string
 
 fake = Faker()
 df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
+f = open("super_db_seed.txt", "w") 
 
 num_users = 9001
 num_products_more_or_less = 15
@@ -20,6 +21,7 @@ order_items = []
 products = []
 users = []
 cards = []
+
 
 
 #region USERS
@@ -61,7 +63,8 @@ def print_users():
     values = f"(email, first_name, last_name, user_password, phone)"
     for i in range(len(users)):
         string = string + f"INSERT INTO users {values} VALUES ('{users[i]['email']}', '{users[i]['first_name']}', '{users[i]['last_name']}', '{users[i]['user_password']}', '{users[i]['phone']}');\n"
-    print(string)
+    # print(string)
+    f.write(string) #for each insert statement
 
 generate_users(num_users)
 # print_users()
@@ -122,7 +125,7 @@ def print_credit_cards():
     for i in range(len(cards)):
         user_id = cards[i]['user_id'] if 'user_id' in cards[i] else i + 1
         string = string + f"INSERT INTO credit_cards {values} VALUES ({user_id}, '{cards[i]['cardholder_name']}', '{cards[i]['last_four_card_number']}', '{cards[i]['expiration_year']}', '{cards[i]['expiration_month']}');\n"
-    print(string)
+    f.write(string)
 
 generate_credit_cards(num_users)
 # print_credit_cards()
@@ -220,8 +223,8 @@ def print_addresses():
     for i in range(len(addresses)):
         street2_val = f"'{addresses[i]['street2']}'"
         string = string + f"INSERT INTO addresses {values} VALUES({addresses[i]['user_id'] if 'user_id' in addresses[i] else i + 1}, '{addresses[i]['recipient_name']}', '{addresses[i]['street']}', {'NULL' if addresses[i]['street2'] == 'NULL' else f'{street2_val}'}, '{addresses[i]['city']}', '{addresses[i]['state']}', '{addresses[i]['zip']}', {addresses[i]['is_shipping']}, {addresses[i]['is_billing']});\n"
-    print(string)
-
+    # print(string)
+    f.write(string)
 generate_addresses(num_users)
 # print_addresses()
 # print(len(addresses))
@@ -256,9 +259,11 @@ def print_products():
     string = ""
     values = f"(upc, prod_name, prod_description, brand, category, price_per_unit, image_url, available_stock, reserved_stock, shipped_stock)"
     for i in range(len(products)):
-        # string = string + f"INSERT INTO products VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['prod_description']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']},);\n"
-        string = string + f"INSERT INTO products VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']},);\n"
-    print(string)
+        string = string + f"INSERT INTO products VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['prod_description']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']},);\n"
+        # string = string + f"INSERT INTO products VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']},);\n"
+    # print(string)
+    f.write(string)
+
 generate_products()
 # print_products()
 
@@ -326,7 +331,8 @@ def print_order_items():
     values = f"(order_id, quantity, upc)"
     for i in range(len(order_items)):
         string = string + f"INSERT INTO order_items {values} VALUES({order_items[i]['order_id']}, {order_items[i]['quantity']}, '{order_items[i]['upc']}');\n"
-    print(string)
+    # print(string)
+    f.write(string)
 
 
 def generate_carts():
@@ -356,7 +362,7 @@ def print_carts():
     values = f"(user_id, quantity, product)"
     for i in range(len(carts)):
         string = string + f"INSERT INTO carts {values} VALUES({carts[i]['user_id']}, {carts[i]['quantity']}, '{carts[i]['upc']}');\n"
-    print(string)
+    f.write(string)
 
 generate_carts()
 ###
@@ -452,7 +458,8 @@ def print_orders():
         shipped_val = f"'{orders[i]['date_shipped']}'" 
         user_id = orders[i]['user_id']
         string = string + f"INSERT INTO orders {values} VALUES({user_id}, {orders[i]['address_id']}, {orders[i]['price']}, {orders[i]['credit_card_id']}, '{orders[i]['date_ordered']}', {'NULL' if orders[i]['date_shipped'] == 'NULL' else f'{shipped_val}'}, '{orders[i]['order_status']}');\n"
-    print(string)
+    #print(string)
+    f.write(string)
 generate_orders(num_users)
 
 
@@ -493,13 +500,25 @@ sort_order_items()
 # sort_order_items()
 
 
-# print_products()
+
+# f = open("super_db_seed.txt", "w") 
+# f.write(s) #for each insert statement
+
+
 print_users()
+f.write(f"\n\n\n")
 print_credit_cards()
+f.write(f"\n\n\n")
 print_addresses()
+f.write(f"\n\n\n")
 print_carts()
+f.write(f"\n\n\n")
 print_orders()
+f.write(f"\n\n\n")
 print_order_items()
+f.write(f"\n\n\n")
+print_products()
+f.close() 
 
 # for user in users:          print(user)
 # for card in cards:          print(card)
