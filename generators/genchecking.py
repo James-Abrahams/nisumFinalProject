@@ -10,7 +10,7 @@ fake = Faker()
 num_users = 5
 num_products_more_or_less = 15
 today = date.today()
-print("today: ", today)
+# print("today: ", today)
 
 orders = []
 carts = []
@@ -62,7 +62,7 @@ def print_users():
     print(string)
 
 generate_users(num_users)
-print_users()
+# print_users()
 # print(user_list)
 # print(len(user_list))
 # endregion
@@ -121,7 +121,7 @@ def print_credit_cards():
     print(string)
 
 generate_credit_cards(num_users)
-print_credit_cards()
+# print_credit_cards()
 # print(len(cards))
 # endregion
 
@@ -216,7 +216,7 @@ def print_addresses():
     print(string)
 
 generate_addresses(num_users)
-print_addresses()
+# print_addresses()
 # print(len(addresses))
 # endregion
 
@@ -236,7 +236,7 @@ def generate_products():
             "brand": row.iloc[0]['Brand'],
             "prod_description": row.iloc[0]['ProdDescription'],
             "category": row.iloc[0]['Category'],
-            "price_per_unit": row.iloc[0]['PricePerUnit'],
+            "price_per_unit": float((row.iloc[0]['PricePerUnit']).split()[0]),
             "image_url": row.iloc[0]['ImageURL'],
             "available_stock": randint(0, 200),
             "reserved_stock": randint(0, 30),
@@ -247,7 +247,6 @@ def generate_products():
 
 
 def print_products():
-    print("um")
     string = ""
     values = f"(upc, prod_name, prod_description, brand, category, price_per_unit, image_url, available_stock, reserved_stock, shipped_stock)"
     for i in range(len(products)):
@@ -291,16 +290,16 @@ def generate_order_items(order_id, numItems):
     totalPrice = 0
     for i in range(numItems):
         quantity = randint(1, 10)
-        print(products)
+        # print(products)
         product = choice(products)
         order_item = {
-            "order_id": order_id,
-            "product_id": product['product_id'],
-            "quantity": quantity
+            "order_id"  : order_id,
+            "upc"       : product['upc'],
+            "quantity"  : quantity
         }
-        totalPrice += (quantity*product['price'])
+        totalPrice += (quantity*product['price_per_unit'])
         order_items.append(order_item)
-        print(order_item)
+        # print(order_item)
     return round(totalPrice, 2)
 
 def generate_carts():
@@ -369,7 +368,7 @@ def generate_order_for_user(order_num, user, order_date, shipping_date, order_st
     # price = generate_order_items_per_order(order[id])
     num_order_items = randint(1,20)
     price = generate_order_items(order_num, num_order_items)
-    orders[order_num]['price'] = price
+    order['price'] = price
     orders.append(order)
 
 
@@ -410,6 +409,7 @@ def print_orders():
         user_id = orders[i]['preliminary_id'] if 'user_id' in orders[i] else i + 1
         # string = string + f"INSERT INTO orders {values} VALUES({user_id}, {orders[i]['address_id']}, {orders[i]['price']}, {orders[i]['credit_card_id']}, '{orders[i]['date_ordered']}', {'NULL' if orders[i]['date_shipped'] == 'NULL' else f'{shipped_val}'}, {'NULL' if orders[i]['date_delivered'] == 'NULL' else f'{delivered_val}'}, '{orders[i]['order_status']}');\n"
         string = string + f"{user_id}, '{orders[i]['date_ordered']}', {'NULL' if orders[i]['date_shipped'] == 'NULL' else f'{shipped_val}'}, '{orders[i]['order_status']}';\n"
-    print(string)
+    # print(string)
 
-print_orders(num_users)
+
+# print_orders(num_users)
