@@ -9,7 +9,7 @@ import string
 fake = Faker()
 df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
 
-num_users = 20
+num_users = 30000
 num_products_more_or_less = 15
 today = date.today()
 # print("today: ", today)
@@ -234,7 +234,7 @@ def generate_products():
     products.clear()
     
     codes = list(df['ProdCode'])
-    codes = codes[:21]
+    # codes = codes
     for code in codes:
         row = df.loc[df['ProdCode'] == code]
         product = {
@@ -292,7 +292,7 @@ def getOrderCard(userId):
     return possCards
 
 
-def generate_order_items(order_id, numItems):
+def generate_order_items(pre_id, numItems):
     totalPrice = 0
     usedProducts = set()
     for i in range(numItems):
@@ -304,7 +304,8 @@ def generate_order_items(order_id, numItems):
         usedProducts.add(product['upc'])
         #disallow products already in cart#
         order_item = {
-            "order_id"  : order_id,
+            "order_id"  : None,
+            "pre_id"    : pre_id,
             "upc"       : product['upc'],
             "quantity"  : quantity
         }
@@ -402,21 +403,24 @@ def generate_orders(num_users):
         user = users[user_idx]
         possible_addresses = getOrderAddress(user['user_id'])
         possible_credit_cards = getOrderCard(user['user_id'])
+        
+        user_order_num = 1
         did_all_orders = False
         while did_all_orders == False:
             d100 = randint(1,100)
-            order_date = date_ordered(order_num)
+            order_date = date_ordered(user_order_num)
             date_shipped_and_status = date_shipped(order_date)
             shipping_date = date_shipped_and_status[0]
             order_status = date_shipped_and_status[1]
             generate_order_for_user(order_num, user, order_date, shipping_date, order_status, possible_addresses, possible_credit_cards)
             
-            if d100 > 91:
+            if d100 > 92 or user_order_num == 240:
             # if d100 > 0:
                 did_all_orders = True
                 user_idx += 1
+                user_order_num = 1
 
-            order_num += 1
+            user_order_num += 1
 
 
 def print_orders():
@@ -424,27 +428,36 @@ def print_orders():
     values = f"(user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status)"
     for i in range(len(orders)):
         shipped_val = f"'{orders[i]['date_shipped']}'" 
-        user_id = orders[i]['preliminary_id'] if 'user_id' in orders[i] else i + 1
+        user_id = orders[i]['user_id']
         string = string + f"INSERT INTO orders {values} VALUES({user_id}, {orders[i]['address_id']}, {orders[i]['price']}, {orders[i]['credit_card_id']}, '{orders[i]['date_ordered']}', {'NULL' if orders[i]['date_shipped'] == 'NULL' else f'{shipped_val}'}, '{orders[i]['order_status']}');\n"
-        # string = string + f"{user_id}, '{orders[i]['date_ordered']}', {'NULL' if orders[i]['date_shipped'] == 'NULL' else f'{shipped_val}'}, '{orders[i]['order_status']}';\n"
     print(string)
 generate_orders(num_users)
 
 
 
+def sort_orders():
+    orders.sort(key = lambda order: datetime.strptime(str(order['date_ordered']), "%Y-%m-%d"), reverse=True)
+sort_orders()
 
 
+def give_ids_to_orders():
+    for i in range(len(orders)):
+        orders[i]['order_id'] = i + 1
 
 
+# def sort_order_items():
+#     orders.sort(key = lambda x: x['order_id'], reverse=True)
+give_ids_to_orders()
+# sort_order_items()
 
 
-print_users()
-print_credit_cards()
-print_addresses()
-print_carts()
-print_products()
+# print_users()
+# print_credit_cards()
+# print_addresses()
+# print_carts()
+# print_products()
 print_orders()
-print_order_items()
+# print_order_items()
 
 # for user in users:          print(user)
 # for card in cards:          print(card)
@@ -453,3 +466,11 @@ print_order_items()
 # for product in products:    print(product)
 # for order in orders:        print(order)
 # for items in order_items:   print(items)
+
+# INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status) VALUES(21, 1, 211.38, 1, '2021-01-23', '2021-01-23', 'SHIPPED');
+# INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status) VALUES(22, 1, 72.97, 1, '2020-12-31', '2020-12-31', 'SHIPPED');
+# INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status) VALUES(23, 1, 44.1, 1, '2020-12-15', '2020-12-15', 'SHIPPED');
+# INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status) VALUES(24, 1, 122.9, 1, '2020-11-07', '2020-11-07', 'SHIPPED');
+# INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status) VALUES(25, 1, 242.69, 1, '2020-09-25', '2020-09-25', 'SHIPPED');
+# INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status) VALUES(26, 1, 361.08, 1, '2020-09-08', '2020-09-09', 'CANCELLED');
+# INSERT INTO orders (user_id, address_id, price, credit_card_id, date_ordered, date_shipped, date_delivered, order_status) VALUES(27, 1, 53.51, 1, '2020-07-25', '2020-07-25', 'SHIPPED');
