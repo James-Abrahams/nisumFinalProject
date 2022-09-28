@@ -13,7 +13,7 @@ for code in codes:
         "upc": row.iloc[0]['ProdCode'],
         "prod_name": row.iloc[0]['ProdName'],
         "brand": row.iloc[0]['Brand'],
-        "prod_description": row.iloc[0]['ProdDescription'] + " Foods, Inc",
+        "prod_description": row.iloc[0]['ProdDescription'],
         "category": row.iloc[0]['Category'],
         "price_per_unit": row.iloc[0]['PricePerUnit'],
         "image_url": row.iloc[0]['ImageURL'],

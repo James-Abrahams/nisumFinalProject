@@ -1,12 +1,13 @@
 from random import randint, choice, choices
 from faker import Faker
 from faker_food import FoodProvider
+import pandas as pd
 from math import floor, sqrt
 from datetime import datetime, timedelta, date
 import string
 fake = Faker()
 
-num_users = 20
+num_users = 5
 num_products_more_or_less = 15
 today = date.today()
 print("today: ", today)
@@ -14,7 +15,9 @@ print("today: ", today)
 orders = []
 carts = []
 order_items = []
-
+products = []
+user_list = []
+cards = []
 
 
 #region USERS
@@ -28,7 +31,7 @@ def phone():
             all_gucci = True
     return num
 
-user_list = []
+
 
 def generate_users(num_users):
     user_list.clear()
@@ -65,7 +68,7 @@ print_users()
 # endregion
 
 # region CREDIT
-cards = []
+
 
 
 def cardholder_name(first_name = fake.first_name(), last_name = fake.last_name(), middle_name = None): 
@@ -220,7 +223,53 @@ print_addresses()
 
 
 ####
+def generate_products():
+    df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
 
+    codes = list(df['ProdCode'])
+
+    for code in codes:
+        row = df.loc[df['ProdCode'] == code]
+        product = {
+            "upc": row.iloc[0]['ProdCode'],
+            "prod_name": row.iloc[0]['ProdName'],
+            "brand": row.iloc[0]['Brand'],
+            "prod_description": row.iloc[0]['ProdDescription'],
+            "category": row.iloc[0]['Category'],
+            "price_per_unit": row.iloc[0]['PricePerUnit'],
+            "image_url": row.iloc[0]['ImageURL'],
+            "available_stock": randint(0, 200),
+            "reserved_stock": randint(0, 30),
+            "shipped_stock": randint(0, 60),
+        }
+        products.append(product)
+    # print(products)
+
+
+def print_products():
+    print("um")
+    string = ""
+    values = f"(upc, prod_name, prod_description, brand, category, price_per_unit, image_url, available_stock, reserved_stock, shipped_stock)"
+    for i in range(len(products)):
+        string = string + f"INSERT INTO products VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['prod_description']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']},);\n"
+        # string = string + f"INSERT INTO products {values} VALUES('{products[i]['upc']}', '{products[i]['prod_name']}', '{products[i]['prod_description']}', '{products[i]['brand']}', '{products[i]['category']}', {products[i]['price_per_unit']}, '{products[i]['image_url']}', {products[i]['available_stock']}, {products[i]['reserved_stock']}, {products[i]['shipped_stock']},);\n"
+    print(string)
+# print_products()
+generate_products()
+
+
+
+
+
+
+
+
+
+
+
+
+
+####
 def getOrderAddress(userId):
     possAddresses = []
     for address in addresses:
@@ -231,9 +280,9 @@ def getOrderAddress(userId):
 
 def getOrderCard(userId):
     possCards = []
-    for address in cards:
-        if address['user_id'] == userId:
-            possAddresses.append(address['credit_id'])
+    for card in cards:
+        if card['user_id'] == userId:
+            possCards.append(card['card_id'])
     #return random address from user
     return choice(possCards)
 
@@ -242,7 +291,8 @@ def generate_order_items(order_id, numItems):
     totalPrice = 0
     for i in range(numItems):
         quantity = randint(1, 10)
-        product = choice('products')
+        print(products)
+        product = choice(products)
         order_item = {
             "order_id": order_id,
             "product_id": product['product_id'],
@@ -303,14 +353,14 @@ def date_shipped(order_date):
     return [order_date, "SHIPPED"]
 
 
-def generate_order_for_user(cart_id, user, order_date, shipping_date, order_status): #, date_ordered, date_shipped):
+def generate_order_for_user(order_num, user, order_date, shipping_date, order_status): #, date_ordered, date_shipped):
     order = {
-        "order_id"        : user,
+        "order_id"        : None,
         "user_id"         : user['user_id'],
         "address_id"      : getOrderAddress(user['user_id']),
         "price"           : -1,
         "credit_card_id"  : getOrderCard(user['user_id']),
-        'preliminary_id'  : user, 
+        'preliminary_id'  : order_num, 
         "date_ordered"    : order_date,
         "date_shipped"    : shipping_date,
         "order_status"    : order_status,
@@ -318,17 +368,17 @@ def generate_order_for_user(cart_id, user, order_date, shipping_date, order_stat
     # id = order['preliminary_id']
     # price = generate_order_items_per_order(order[id])
     num_order_items = randint(1,20)
-    price = generate_order_items(i+1, num_order_items)
-    orders[i+1]['price'] = price
+    price = generate_order_items(order_num, num_order_items)
+    orders[order_num]['price'] = price
     orders.append(order)
-    i += 1
+
 
 
 def generate_orders(num_users):
     orders.clear()
-    card_id = 1
     user_id = 1
     order_num = 1
+    user = user_list[user_id]
 
     while user_id < num_users:
         did_all_orders = False
@@ -338,17 +388,15 @@ def generate_orders(num_users):
             date_shipped_and_status = date_shipped(order_date)
             shipping_date = date_shipped_and_status[0]
             order_status = date_shipped_and_status[1]
-            generate_order_for_user(cart_id, user_id, order_date, shipping_date, order_status)
+            generate_order_for_user(order_num, user, order_date, shipping_date, order_status)
             
             if d100 > 91:
                 did_all_orders = True
                 user_id += 1
-                order_num = 1
-            else:
-                order_num += 1
-            cart_id += 1
 
-generate_orders()
+            order_num = 1
+
+generate_orders(num_users)
 
 # print(orders)
 
