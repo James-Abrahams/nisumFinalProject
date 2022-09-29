@@ -24,7 +24,7 @@ for col in list(df.columns):
 f = open("super_db_seed_mini.txt", "w") #4 users
 states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
-num_users = 5000
+num_users = 50
 num_products_more_or_less = 15
 today = date.today()
 
@@ -383,7 +383,6 @@ def generate_order_for_user(order_num, user, order_date, shipping_date, order_st
     order_item = generate_order_items(order_num, num_order_items)
     price = order_item['total_price']
     order['price'] = price
-    print(order)
     if order['order_status'] == 'PENDING':
         reserved_items[order_item['upc']] += order_item['quantity']
     elif order['order_status'] == 'SHIPPED':
@@ -447,7 +446,7 @@ def add_quantities_to_products():
         upc = product['upc']
         if upc in reserved_items: product['reserved_stock'] += reserved_items[upc]
         if upc in shipped_items: product['shipped_stock'] += shipped_items[upc]
-        product['available_stock'] = int(product['reserved_stock'] * float(f"{randint(0, 2)}.{randint(0, 9)}{randint(0, 9)}{randint(0, 9)}"))
+        product['available_stock'] = int(product['reserved_stock'] * float(f"{randint(0, 2)}.{randint(0, 9)}{randint(0, 9)}{randint(0, 9)}")) + randint(0, 10)
 add_quantities_to_products()
 
 
@@ -494,6 +493,6 @@ def create_text():
     f.write(f"\n\n\n")
     print_products()
 
-# create_text()
+create_text()
 
 f.close() 
