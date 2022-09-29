@@ -16,6 +16,10 @@ for col in list(df.columns):
         continue
 
 
+#create stock dictionaries => key is upc val is stock
+#incremente stock dictionaries as we check shipped vs pending 
+#iterate product list and update stocks based on dictionaries
+
 # f = open("super_db_seed.txt", "w") #9901
 f = open("super_db_seed_mini.txt", "w") #4 users
 states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
@@ -217,6 +221,22 @@ def print_addresses():
     f.write(string)
 generate_addresses(num_users)
 
+def create_product(code):
+    row = df.loc[df['ProdCode'] == code]
+    product = {
+        "upc": row.iloc[0]['ProdCode'],
+        "prod_name": row.iloc[0]['ProdName'],
+        "brand": row.iloc[0]['Brand'],
+        "prod_description": row.iloc[0]['ProdDescription'],
+        "category": row.iloc[0]['Category'],
+        "price_per_unit": float((row.iloc[0]['PricePerUnit']).split()[0]),
+        "image_url": row.iloc[0]['ImageURL'],
+        "available_stock": randint(0, 200),
+        "reserved_stock": 0,
+        "shipped_stock": 0,
+    }
+    return product
+
 def generate_products():
     products.clear()
     
@@ -224,20 +244,7 @@ def generate_products():
     random_products = randint(1, 1750) ##################
     codes = codes[random_products:random_products+30]####
     for code in codes:
-        row = df.loc[df['ProdCode'] == code]
-        product = {
-            "upc": row.iloc[0]['ProdCode'],
-            "prod_name": row.iloc[0]['ProdName'],
-            "brand": row.iloc[0]['Brand'],
-            "prod_description": row.iloc[0]['ProdDescription'],
-            "category": row.iloc[0]['Category'],
-            "price_per_unit": float((row.iloc[0]['PricePerUnit']).split()[0]),
-            "image_url": row.iloc[0]['ImageURL'],
-            "available_stock": randint(0, 200),
-            "reserved_stock": randint(0, 30),
-            "shipped_stock": randint(0, 60),
-        }
-        products.append(product)
+        products.append(create_product())
 
 
 def print_products():
@@ -282,14 +289,16 @@ def generate_order_items(pre_id, numItems):
             product = choice(products)
         usedProducts.add(product['upc'])
         order_item = {
-            "order_id"  : None,
-            "pre_id"    : pre_id,
-            "upc"       : product['upc'],
-            "quantity"  : quantity
+            "order_id"    : None,
+            "pre_id"      : pre_id,
+            "upc"         : product['upc'],
+            "quantity"    : quantity,
+            "total_price" : -1,
         }
         totalPrice += (quantity*product['price_per_unit'])
+        order_item['total_price'] = round(totalPrice, 2)
         order_items.append(order_item)
-    return round(totalPrice, 2)
+    return order_item
 
 def print_order_items():
     string = ""
@@ -365,9 +374,20 @@ def generate_order_for_user(order_num, user, order_date, shipping_date, order_st
     }      
 
     num_order_items = randint(1,20)
-    price = generate_order_items(order_num, num_order_items)
+    order_item = generate_order_items(order_num, num_order_items)
+    price = order_item['total_price']
     order['price'] = price
+    if order['status'] == 'PENDING':
+        #find item
+        return 'yomama'
+    elif order['status'] == 'SHIPPED':
+        #find and insert
+        return 'yomama'
+
     orders.append(order)
+
+
+
 
 
 def generate_orders(num_users):
