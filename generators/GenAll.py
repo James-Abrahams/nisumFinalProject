@@ -1,6 +1,5 @@
 from random import randint, choice, choices, shuffle
 from datetime import datetime, timedelta, date
-from faker_food import FoodProvider
 from shutil import make_archive
 from faker import Faker
 import pandas as pd
