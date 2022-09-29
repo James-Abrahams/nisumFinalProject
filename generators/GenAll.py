@@ -16,8 +16,8 @@ for col in list(df.columns):
 
 f = open("super_db_seed.txt", "w") #9901
 num_users = 9001
-# f = open("super_db_seed_mini.txt", "w") #50 users
-# num_users = 50
+# f = open("super_db_seed_mini.txt", "w") #10 users
+# num_users = 10
 
 
 states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
@@ -255,8 +255,8 @@ def create_product(code):
 def generate_products():
     products.clear()
     codes = list(df['ProdCode'])
-    # random_products = randint(1, 1750) ##################
-    # codes = codes[random_products:random_products+30]####
+    # random_products = randint(1, 1760) ##################
+    # codes = codes[random_products:random_products+40]####
     for code in codes:
         products.append(create_product(code))
 
