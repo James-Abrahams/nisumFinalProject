@@ -5,6 +5,7 @@ import pandas as pd
 from math import floor, sqrt
 from datetime import datetime, timedelta, date
 import string
+from shutil import make_archive
 
 fake = Faker()
 df = pd.read_csv('../safeway-products-scraper/safewayData.csv',index_col=False)
@@ -20,11 +21,14 @@ for col in list(df.columns):
 #incremente stock dictionaries as we check shipped vs pending 
 #iterate product list and update stocks based on dictionaries
 
-# f = open("super_db_seed.txt", "w") #9901
-f = open("super_db_seed_mini.txt", "w") #4 users
+f = open("super_db_seed.txt", "w") #9901
+# f = open("super_db_seed_mini.txt", "w") #50 users
+
+
 states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
-num_users = 50
+num_users = 9001
+# num_users = 50
 num_products_more_or_less = 15
 today = date.today()
 
@@ -248,7 +252,7 @@ def generate_products():
     codes = list(df['ProdCode'])
     random_products = randint(1, 1750) ##################
 
-    codes = codes[random_products:random_products+30]####
+    # codes = codes[random_products:random_products+30]####
     for code in codes:
         products.append(create_product(code))
 
@@ -289,7 +293,7 @@ def generate_order_items(pre_id, numItems):
     totalPrice = 0
     usedProducts = set()
     for i in range(numItems):
-        quantity = randint(1, 6)
+        quantity = randint(1, randint(1,6))
         product = choice(products)
         while product['upc'] in usedProducts:
             product = choice(products)
@@ -446,7 +450,10 @@ def add_quantities_to_products():
         upc = product['upc']
         if upc in reserved_items: product['reserved_stock'] += reserved_items[upc]
         if upc in shipped_items: product['shipped_stock'] += shipped_items[upc]
-        product['available_stock'] = int(product['reserved_stock'] * float(f"{randint(0, 2)}.{randint(0, 9)}{randint(0, 9)}{randint(0, 9)}")) + randint(0, 10)
+        if product['reserved_stock'] == 0:
+            product['available_stock'] = randint(randint(1,10), randint(11,20))
+        else:
+            product['available_stock'] = int(product['reserved_stock'] * float(f"{randint(0, 2)}.{randint(0, 9)}{randint(0, 9)}{randint(0, 9)}")) + randint(0, 10)
 add_quantities_to_products()
 
 
@@ -496,3 +503,4 @@ def create_text():
 create_text()
 
 f.close() 
+make_archive('super_db_seed_zipped', 'zip', '/Users/j/Desktop/work/final/nisumFinalProject/generators/', 'super_db_seed.txt')
