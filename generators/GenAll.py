@@ -24,17 +24,19 @@ for col in list(df.columns):
 f = open("super_db_seed_mini.txt", "w") #4 users
 states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
-num_users = 4
+num_users = 5000
 num_products_more_or_less = 15
 today = date.today()
 
-orders = []
-carts = []
-order_items = []
-products = []
-users = []
-cards = []
-addresses = []
+orders          = []
+carts           = []
+order_items     = []
+products        = []
+users           = []
+cards           = []
+addresses       = []
+reserved_items  = dict()
+shipped_items   = dict()
 
 #region USERS
 def phone():
@@ -235,6 +237,9 @@ def create_product(code):
         "reserved_stock": 0,
         "shipped_stock": 0,
     }
+    upc = product['upc']
+    reserved_items[upc] = 0 
+    shipped_items[upc] = 0
     return product
 
 def generate_products():
@@ -242,9 +247,10 @@ def generate_products():
     
     codes = list(df['ProdCode'])
     random_products = randint(1, 1750) ##################
+
     codes = codes[random_products:random_products+30]####
     for code in codes:
-        products.append(create_product())
+        products.append(create_product(code))
 
 
 def print_products():
@@ -377,12 +383,11 @@ def generate_order_for_user(order_num, user, order_date, shipping_date, order_st
     order_item = generate_order_items(order_num, num_order_items)
     price = order_item['total_price']
     order['price'] = price
-    if order['status'] == 'PENDING':
-        #find item
-        return 'yomama'
-    elif order['status'] == 'SHIPPED':
-        #find and insert
-        return 'yomama'
+    print(order)
+    if order['order_status'] == 'PENDING':
+        reserved_items[order_item['upc']] += order_item['quantity']
+    elif order['order_status'] == 'SHIPPED':
+        shipped_items[order_item['upc']] += order_item['quantity']
 
     orders.append(order)
 
@@ -437,12 +442,21 @@ def print_orders():
     f.write(string)
 generate_orders(num_users)
 
+def add_quantities_to_products():
+    for product in products:
+        upc = product['upc']
+        if upc in reserved_items: product['reserved_stock'] += reserved_items[upc]
+        if upc in shipped_items: product['shipped_stock'] += shipped_items[upc]
+        product['available_stock'] = int(product['reserved_stock'] * float(f"{randint(0, 2)}.{randint(0, 9)}{randint(0, 9)}{randint(0, 9)}"))
+add_quantities_to_products()
 
 
 def sort_orders():
     orders.sort(key = lambda order: datetime.strptime(str(order['date_ordered']), "%Y-%m-%d"))
 sort_orders()
-
+print(reserved_items)
+print(shipped_items)
+for product in products: print(product['upc'],'available: ', product['available_stock'], 'reserved: ', product['reserved_stock'], 'shipped: ', product['shipped_stock'])
 
 def give_ids_to_orders():
     for i in range(len(orders)):
@@ -480,6 +494,6 @@ def create_text():
     f.write(f"\n\n\n")
     print_products()
 
-create_text()
+# create_text()
 
 f.close() 
