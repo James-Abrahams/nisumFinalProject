@@ -486,6 +486,8 @@ sort_order_items()
 
 
 def create_text():
+    print_products()
+    f.write(f"\n\n\n")
     print_users()
     f.write(f"\n\n\n")
     print_credit_cards()
@@ -497,8 +499,6 @@ def create_text():
     print_orders()
     f.write(f"\n\n\n")
     print_order_items()
-    f.write(f"\n\n\n")
-    print_products()
 create_text()
 
 f.close() 
