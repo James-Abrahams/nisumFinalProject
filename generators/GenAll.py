@@ -14,11 +14,13 @@ for col in list(df.columns):
         print(col)
         continue
 
-f = open("super_db_seed.txt", "w") #9901
-num_users = 9001
+# f = open("super_db_seed.txt", "w") #9901
+# num_users = 9001
 # f = open("super_db_seed_mini.txt", "w") #10 users
 # num_users = 10
 
+f = open("super_db_seed_lite.txt", "w") #9901
+num_users = 100
 
 states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
@@ -502,4 +504,5 @@ def create_text():
 create_text()
 
 f.close() 
-make_archive('super_db_seed_zipped', 'zip', '/Users/j/Desktop/work/final/nisumFinalProject/generators/', 'super_db_seed.txt')
+# make_archive('super_db_seed_zipped', 'zip', '/Users/j/Desktop/work/final/nisumFinalProject/generators/', 'super_db_seed_lite.txt')
+make_archive('db_seed_lite', 'zip', '/Users/j/Desktop/work/final/nisumFinalProject/generators/', 'super_db_seed_lite.txt')
