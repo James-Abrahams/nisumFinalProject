@@ -31,7 +31,7 @@ CREATE TABLE addresses
     is_shipping INT NOT NULL,
     is_billing INT NOT NULL,
     PRIMARY KEY (address_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE products
@@ -56,8 +56,8 @@ CREATE TABLE cart_items
     upc CHAR(12) NOT NULL,
     quantity INT,
     PRIMARY KEY (cart_item_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id),
-    FOREIGN KEY (upc) REFERENCES products (upc)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (upc) REFERENCES products (upc) ON DELETE CASCADE
 );
 
 CREATE TABLE credit_cards
@@ -69,7 +69,7 @@ CREATE TABLE credit_cards
     expiration_year CHAR(4) NOT NULL,
     expiration_month CHAR(2) NOT NULL,
     PRIMARY KEY (credit_card_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE orders
@@ -83,9 +83,9 @@ CREATE TABLE orders
     date_shipped DATETIME,
     order_status VARCHAR(20) NOT NULL,
     PRIMARY KEY (order_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id),
-    FOREIGN KEY (address_id) REFERENCES addresses (address_id),
-    FOREIGN KEY (credit_card_id) REFERENCES credit_cards (credit_card_id)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (address_id) REFERENCES addresses (address_id) ON DELETE CASCADE,
+    FOREIGN KEY (credit_card_id) REFERENCES credit_cards (credit_card_id) ON DELETE CASCADE
 );
 
 CREATE TABLE order_items
@@ -95,8 +95,8 @@ CREATE TABLE order_items
     quantity INT NOT NULL,
     upc CHAR(12) NOT NULL,
     PRIMARY KEY (order_item_id),
-    FOREIGN KEY (order_id) REFERENCES orders (order_id),
-    FOREIGN KEY (upc) REFERENCES products (upc)
+    FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE CASCADE,
+    FOREIGN KEY (upc) REFERENCES products (upc) ON DELETE CASCADE
 );
 
 -- LIVESQL VERSION (snake_case)
@@ -132,7 +132,7 @@ CREATE TABLE addresses
     is_shipping INT NOT NULL,
     is_billing INT NOT NULL,
     PRIMARY KEY (address_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE products
@@ -157,8 +157,8 @@ CREATE TABLE cart_items
     upc CHAR(12) NOT NULL,
     quantity INT,
     PRIMARY KEY (cart_item_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id),
-    FOREIGN KEY (upc) REFERENCES products (upc)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (upc) REFERENCES products (upc) ON DELETE CASCADE
 );
 
 CREATE TABLE credit_cards
@@ -170,7 +170,7 @@ CREATE TABLE credit_cards
     expiration_year CHAR(4) NOT NULL,
     expiration_month CHAR(2) NOT NULL,
     PRIMARY KEY (credit_card_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE orders
@@ -184,9 +184,9 @@ CREATE TABLE orders
     date_shipped DATETIME,
     order_status VARCHAR(20) NOT NULL,
     PRIMARY KEY (order_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id),
-    FOREIGN KEY (address_id) REFERENCES addresses (address_id),
-    FOREIGN KEY (credit_card_id) REFERENCES credit_cards (credit_card_id)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (address_id) REFERENCES addresses (address_id) ON DELETE CASCADE,
+    FOREIGN KEY (credit_card_id) REFERENCES credit_cards (credit_card_id) ON DELETE CASCADE
 );
 
 CREATE TABLE order_items
@@ -196,8 +196,8 @@ CREATE TABLE order_items
     quantity INT NOT NULL,
     upc CHAR(12) NOT NULL,
     PRIMARY KEY (order_item_id),
-    FOREIGN KEY (order_id) REFERENCES orders (order_id),
-    FOREIGN KEY (upc) REFERENCES products (upc)
+    FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE CASCADE,
+    FOREIGN KEY (upc) REFERENCES products (upc) ON DELETE CASCADE
 );
 
 
